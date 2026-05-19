@@ -2,113 +2,53 @@ import { useState, useMemo } from "react";
 import "../styles/BookAppointment.css";
 
 const SPECIALTIES = [
-  { icon: "🫀", name: "Cardiology", doctors: 4, price: 180 },
-  { icon: "🧠", name: "Neurology", doctors: 3, price: 200 },
-  { icon: "🦴", name: "Orthopedics", doctors: 5, price: 160 },
-  { icon: "🩺", name: "Internal Medicine", doctors: 6, price: 130 },
-  { icon: "👁️", name: "Ophthalmology", doctors: 3, price: 150 },
-  { icon: "🌿", name: "Dermatology", doctors: 4, price: 140 },
+  { icon: "❤️", name: "Cardiologie", doctors: 1, price: 200 },
+  { icon: "🧠", name: "Neurologie", doctors: 1, price: 170 },
+  { icon: "👁️", name: "Oftalmologie", doctors: 1, price: 150 },
+  { icon: "🌿", name: "Dermatologie", doctors: 1, price: 170 },
 ];
 
 const DOCTORS = {
-  Cardiology: [
+  Cardiologie: [
     {
       id: "d1",
-      name: "Dr. Elena Marchetti",
+      name: "Dr. Popescu Mihai",
       spec: "Cardiology",
-      initials: "EM",
+      initials: "PM",
       rating: "4.9",
       reviews: "312",
       next: "Tomorrow",
     },
-    {
-      id: "d2",
-      name: "Dr. Paul Armand",
-      spec: "Cardiology",
-      initials: "PA",
-      rating: "4.7",
-      reviews: "198",
-      next: "May 19",
-    },
   ],
-  Neurology: [
+  Neurologie: [
     {
       id: "d3",
-      name: "Dr. James Okafor",
+      name: "Dr. Stoica Sebastian",
       spec: "Neurology",
-      initials: "JO",
+      initials: "SS",
       rating: "4.8",
       reviews: "274",
       next: "Today",
     },
-    {
-      id: "d4",
-      name: "Dr. Lena Hoffmann",
-      spec: "Neurology",
-      initials: "LH",
-      rating: "4.6",
-      reviews: "145",
-      next: "May 20",
-    },
   ],
-  Orthopedics: [
-    {
-      id: "d5",
-      name: "Dr. Sophia Reyes",
-      spec: "Orthopedics",
-      initials: "SR",
-      rating: "5.0",
-      reviews: "198",
-      next: "Tomorrow",
-    },
-    {
-      id: "d6",
-      name: "Dr. Marcus Webb",
-      spec: "Orthopedics",
-      initials: "MW",
-      rating: "4.8",
-      reviews: "221",
-      next: "May 21",
-    },
-  ],
-  "Internal Medicine": [
-    {
-      id: "d7",
-      name: "Dr. Alan Voss",
-      spec: "Internal Medicine",
-      initials: "AV",
-      rating: "4.7",
-      reviews: "421",
-      next: "Today",
-    },
-    {
-      id: "d8",
-      name: "Dr. Yuki Tanaka",
-      spec: "Internal Medicine",
-      initials: "YT",
-      rating: "4.9",
-      reviews: "317",
-      next: "Tomorrow",
-    },
-  ],
-  Ophthalmology: [
+  Oftalmologie: [
     {
       id: "d9",
-      name: "Dr. Claire Dupont",
+      name: "Dr. Dumitrescu Andreea",
       spec: "Ophthalmology",
-      initials: "CD",
-      rating: "4.8",
+      initials: "DA",
+      rating: "4.7",
       reviews: "159",
       next: "May 19",
     },
   ],
-  Dermatology: [
+  Dermatologie: [
     {
       id: "d10",
-      name: "Dr. Nadia Petrov",
+      name: "Dr. Marinescu Ioana",
       spec: "Dermatology",
-      initials: "NP",
-      rating: "4.9",
+      initials: "MI",
+      rating: "5.0",
       reviews: "283",
       next: "Tomorrow",
     },
@@ -262,16 +202,16 @@ function SummaryPanel({ step, booking }) {
 
   return (
     <aside className="bk-right">
-      <div className="bk-summary-title">Booking Summary</div>
+      <div className="bk-summary-title">Rezumatul rezervării</div>
 
       <div className="bk-summary-section">
-        <div className="bk-summary-label">Specialty</div>
+        <div className="bk-summary-label">Specialitate</div>
         {booking.specialty ? (
           <div className="bk-summary-val big">
             {spec?.icon} {booking.specialty}
           </div>
         ) : (
-          <div className="bk-summary-placeholder">Not selected yet</div>
+          <div className="bk-summary-placeholder">Nu e selectat încă </div>
         )}
       </div>
 
@@ -286,7 +226,7 @@ function SummaryPanel({ step, booking }) {
             </div>
           </div>
         ) : (
-          <div className="bk-summary-placeholder">Not selected yet</div>
+          <div className="bk-summary-placeholder">Nu e selectat încă </div>
         )}
       </div>
 
@@ -303,11 +243,11 @@ function SummaryPanel({ step, booking }) {
             {fmtDate(booking.date)}
             <br />
             <span style={{ color: "rgba(255,255,255,0.3)" }}>
-              Time not chosen
+              Ora nu e selectată
             </span>
           </div>
         ) : (
-          <div className="bk-summary-placeholder">Not selected yet</div>
+          <div className="bk-summary-placeholder">Nu e selectat încă </div>
         )}
       </div>
 
@@ -322,31 +262,28 @@ function SummaryPanel({ step, booking }) {
             </span>
           </div>
         ) : (
-          <div className="bk-summary-placeholder">Not entered yet</div>
+          <div className="bk-summary-placeholder">Nu e introdus încă </div>
         )}
       </div>
 
       <div className="bk-summary-divider" />
 
       <div className="bk-summary-total">
-        <div className="bk-summary-total-label">Consultation Fee</div>
+        <div className="bk-summary-total-label">Cost consultație</div>
         <div className="bk-summary-total-price">
           {spec ? `£${spec.price}` : "—"}
         </div>
-        <div className="bk-summary-total-note">
-          Payment collected at the clinic
-        </div>
+        <div className="bk-summary-total-note">Plata colectată la clinică.</div>
       </div>
 
       <div className="bk-summary-help">
-        Need help? Call us at <a href="#">+44 20 7946 0300</a> or email{" "}
-        <a href="#">hello@vitamedclinic.com</a>
+        Aveți nevoie de ajutor? Sunați-ne la <a href="#">+40 721 498 305</a>
       </div>
     </aside>
   );
 }
 
-const STEPS = ["Specialty", "Doctor", "Date & Time", "Your Details"];
+const STEPS = ["Specialitate", "Doctor", "Dată & oră", "Detalii"];
 
 export default function BookAppointment() {
   const [step, setStep] = useState(0);
@@ -408,11 +345,11 @@ export default function BookAppointment() {
             <div className="bk-success-ring">✓</div>
             <div className="bk-success-id">Ref: {refId}</div>
             <h2 className="bk-success-title">
-              Appointment <em>confirmed!</em>
+              Programare <em>confirmată!</em>
             </h2>
             <p className="bk-success-sub">
-              Your booking has been received. You'll get a confirmation email at{" "}
-              <strong>{booking.email}</strong> within a few minutes.
+              Rezervarea dvs. a fost primită. Veți primi un e-mail de confirmare
+              la adresa <strong>{booking.email}</strong> în câteva momente.
             </p>
             <div className="bk-success-details">
               <div>
@@ -422,17 +359,17 @@ export default function BookAppointment() {
                 </div>
               </div>
               <div>
-                <div className="bk-success-detail-label">Specialty</div>
+                <div className="bk-success-detail-label">Specialitate</div>
                 <div className="bk-success-detail-val">{booking.specialty}</div>
               </div>
               <div>
-                <div className="bk-success-detail-label">Date</div>
+                <div className="bk-success-detail-label">Dată</div>
                 <div className="bk-success-detail-val">
                   {fmtDate(booking.date)}
                 </div>
               </div>
               <div>
-                <div className="bk-success-detail-label">Time</div>
+                <div className="bk-success-detail-label">Oră</div>
                 <div className="bk-success-detail-val">
                   {booking.time} · {booking.visitType}
                 </div>
@@ -443,7 +380,7 @@ export default function BookAppointment() {
                 className="bk-success-btn-primary"
                 onClick={() => (window.location.href = "/reservations")}
               >
-                View My Appointments
+                Vezi programăriile mele
               </button>
               <button
                 className="bk-success-btn-ghost"
@@ -484,7 +421,7 @@ export default function BookAppointment() {
           </span>
         </a>
         <a href="/reservations" className="bk-nav-back">
-          ← My Appointments
+          ← Programăriile mele
         </a>
       </nav>
 
@@ -504,9 +441,9 @@ export default function BookAppointment() {
 
           {step === 0 && (
             <div className="bk-panel">
-              <div className="bk-section-eyebrow">Step 1 of 4</div>
+              <div className="bk-section-eyebrow">Pasul 1 din 4</div>
               <h2 className="bk-section-title">
-                Choose a <em>specialty</em>
+                Alege o <em>specialitate</em>
               </h2>
               <div className="bk-specialty-grid">
                 {SPECIALTIES.map((s) => (
@@ -521,7 +458,7 @@ export default function BookAppointment() {
                     <span className="bk-spec-icon">{s.icon}</span>
                     <div className="bk-spec-name">{s.name}</div>
                     <div className="bk-spec-count">
-                      {s.doctors} specialists · from £{s.price}
+                      {s.doctors} specialist · de la {s.price} lei
                     </div>
                   </div>
                 ))}
@@ -532,7 +469,7 @@ export default function BookAppointment() {
                   disabled={!canNext[0]}
                   onClick={() => setStep(1)}
                 >
-                  Continue →
+                  Continuă →
                 </button>
               </div>
             </div>
@@ -540,9 +477,9 @@ export default function BookAppointment() {
 
           {step === 1 && (
             <div className="bk-panel">
-              <div className="bk-section-eyebrow">Step 2 of 4</div>
+              <div className="bk-section-eyebrow">Pasul 2 din 4</div>
               <h2 className="bk-section-title">
-                Select a <em>doctor</em>
+                Selectează un <em>doctor</em>
               </h2>
               <div className="bk-doctor-list">
                 {(DOCTORS[booking.specialty] || []).map((d) => (
@@ -563,7 +500,9 @@ export default function BookAppointment() {
                       </div>
                     </div>
                     <div className="bk-doc-next">
-                      <div className="bk-doc-next-label">Next available</div>
+                      <div className="bk-doc-next-label">
+                        Următoarea disponibilă
+                      </div>
                       <div className="bk-doc-next-val">{d.next}</div>
                     </div>
                     <div className="bk-check">✓</div>
@@ -572,14 +511,14 @@ export default function BookAppointment() {
               </div>
               <div className="bk-nav-btns">
                 <button className="bk-btn-back" onClick={() => setStep(0)}>
-                  ← Back
+                  ← Înapoi
                 </button>
                 <button
                   className="bk-btn-next"
                   disabled={!canNext[1]}
                   onClick={() => setStep(2)}
                 >
-                  Continue →
+                  Continuă →
                 </button>
               </div>
             </div>
@@ -587,9 +526,9 @@ export default function BookAppointment() {
 
           {step === 2 && (
             <div className="bk-panel">
-              <div className="bk-section-eyebrow">Step 3 of 4</div>
+              <div className="bk-section-eyebrow">Pasul 3 din 4</div>
               <h2 className="bk-section-title">
-                Pick a <em>date & time</em>
+                Selectează o <em>dată & oră</em>
               </h2>
 
               <div className="bk-visit-types" style={{ marginBottom: 28 }}>
@@ -616,7 +555,7 @@ export default function BookAppointment() {
 
               {booking.date && (
                 <>
-                  <div className="bk-slots-title">Available Times</div>
+                  <div className="bk-slots-title">Ore disponibile </div>
                   <div className="bk-slots-grid">
                     {TIMES.map((t) => (
                       <div
@@ -633,14 +572,14 @@ export default function BookAppointment() {
 
               <div className="bk-nav-btns">
                 <button className="bk-btn-back" onClick={() => setStep(1)}>
-                  ← Back
+                  ← Înapoi
                 </button>
                 <button
                   className="bk-btn-next"
                   disabled={!canNext[2]}
                   onClick={() => setStep(3)}
                 >
-                  Continue →
+                  Continuă →
                 </button>
               </div>
             </div>
@@ -648,9 +587,9 @@ export default function BookAppointment() {
 
           {step === 3 && (
             <div className="bk-panel">
-              <div className="bk-section-eyebrow">Step 4 of 4</div>
+              <div className="bk-section-eyebrow">Pasul 4 din 4</div>
               <h2 className="bk-section-title">
-                Your <em>details</em>
+                Detaliile <em>tale</em>
               </h2>
 
               <div className="bk-form-grid" style={{ marginBottom: 16 }}>
@@ -663,7 +602,7 @@ export default function BookAppointment() {
                   />
                 </div>
                 <div className="bk-field">
-                  <label>Last Name *</label>
+                  <label>Nume de familie *</label>
                   <input
                     placeholder="Doe"
                     value={booking.lastName}
@@ -671,7 +610,7 @@ export default function BookAppointment() {
                   />
                 </div>
                 <div className="bk-field">
-                  <label>Email Address *</label>
+                  <label>Adresă de email *</label>
                   <input
                     type="email"
                     placeholder="you@example.com"
@@ -680,7 +619,7 @@ export default function BookAppointment() {
                   />
                 </div>
                 <div className="bk-field">
-                  <label>Phone Number</label>
+                  <label>Număr de telefon</label>
                   <input
                     type="tel"
                     placeholder="+44 7700 900000"
@@ -689,7 +628,7 @@ export default function BookAppointment() {
                   />
                 </div>
                 <div className="bk-field">
-                  <label>Date of Birth</label>
+                  <label>Data nașterii</label>
                   <input
                     type="date"
                     value={booking.dob}
@@ -697,15 +636,15 @@ export default function BookAppointment() {
                   />
                 </div>
                 <div className="bk-field">
-                  <label>Insurance / Policy No.</label>
+                  <label>Asigurare / Număr Poliță</label>
                   <input
-                    placeholder="Optional"
+                    placeholder="Opțional"
                     value={booking.insurance}
                     onChange={(e) => set("insurance", e.target.value)}
                   />
                 </div>
                 <div className="bk-field full" style={{ gridColumn: "1 / -1" }}>
-                  <label>Reason for visit / Notes</label>
+                  <label>Motivul programării / Detalii</label>
                   <textarea
                     placeholder="Describe your symptoms, previous diagnoses, or anything you'd like the doctor to know…"
                     value={booking.notes}
@@ -723,7 +662,7 @@ export default function BookAppointment() {
                   disabled={!canNext[3]}
                   onClick={handleSubmit}
                 >
-                  Confirm Appointment ✓
+                  Confirmă programarea ✓
                 </button>
               </div>
             </div>

@@ -576,10 +576,10 @@ export default function Home() {
           <div className="footer-col footer-contact">
             <h4>Contact</h4>
             <ul>
-              <li>12 Harley St, London</li>
-              <li>+44 20 7946 0300</li>
+              <li>📍 Aleea Cămpul cu flori, nr.14, București</li>
+              <li>+40 721 498 305</li>
               <li style={{ marginTop: 8, color: "var(--gold)", fontSize: 12 }}>
-                Mon–Fri 8:00–20:00
+                Luni–Vineri 8:00–20:00
               </li>
             </ul>
           </div>

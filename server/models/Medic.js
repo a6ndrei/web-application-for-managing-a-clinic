@@ -20,5 +20,7 @@ const Medic = sequelize.define("Medic", {
     allowNull: false,
   },
 });
+Medic.hasMany(Programari, { foreignKey: "id_medic" });
+Medic.hasMany(Pacient, { foreignKey: "id_medic" });
 
 export default Medic;
