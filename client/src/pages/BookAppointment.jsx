@@ -1,5 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import "../styles/BookAppointment.css";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const SPECIALTIES = [
   { icon: "❤️", name: "Cardiologie", doctors: 1, price: 200 },
@@ -8,102 +10,23 @@ const SPECIALTIES = [
   { icon: "🌿", name: "Dermatologie", doctors: 1, price: 170 },
 ];
 
-const DOCTORS = {
-  Cardiologie: [
-    {
-      id: "d1",
-      name: "Dr. Popescu Mihai",
-      spec: "Cardiology",
-      initials: "PM",
-      rating: "4.9",
-      reviews: "312",
-      next: "Tomorrow",
-    },
-  ],
-  Neurologie: [
-    {
-      id: "d3",
-      name: "Dr. Stoica Sebastian",
-      spec: "Neurology",
-      initials: "SS",
-      rating: "4.8",
-      reviews: "274",
-      next: "Today",
-    },
-  ],
-  Oftalmologie: [
-    {
-      id: "d9",
-      name: "Dr. Dumitrescu Andreea",
-      spec: "Ophthalmology",
-      initials: "DA",
-      rating: "4.7",
-      reviews: "159",
-      next: "May 19",
-    },
-  ],
-  Dermatologie: [
-    {
-      id: "d10",
-      name: "Dr. Marinescu Ioana",
-      spec: "Dermatology",
-      initials: "MI",
-      rating: "5.0",
-      reviews: "283",
-      next: "Tomorrow",
-    },
-  ],
-};
-
 const VISIT_TYPES = [
   { icon: "🏥", name: "In-Person", desc: "Visit the clinic" },
   { icon: "💻", name: "Telehealth", desc: "Video consultation" },
 ];
 
 const TIMES = [
-  "8:00 AM",
-  "8:30 AM",
-  "9:00 AM",
-  "9:30 AM",
-  "10:00 AM",
-  "10:30 AM",
-  "11:00 AM",
-  "11:30 AM",
-  "1:00 PM",
-  "1:30 PM",
-  "2:00 PM",
-  "2:30 PM",
-  "3:00 PM",
-  "3:30 PM",
-  "4:00 PM",
-  "4:30 PM",
+  "8:00 AM", "8:30 AM", "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM",
+  "11:00 AM", "11:30 AM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM",
+  "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM"
 ];
-const UNAVAIL = ["8:30 AM", "9:30 AM", "11:00 AM", "1:30 PM", "3:00 PM"];
 
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
 const TODAY = new Date();
 
 function Calendar({ selected, onSelect }) {
-  const [view, setView] = useState({
-    year: TODAY.getFullYear(),
-    month: TODAY.getMonth(),
-  });
-
+  const [view, setView] = useState({ year: TODAY.getFullYear(), month: TODAY.getMonth() });
   const cells = useMemo(() => {
     const first = new Date(view.year, view.month, 1);
     const last = new Date(view.year, view.month + 1, 0);
@@ -112,72 +35,29 @@ function Calendar({ selected, onSelect }) {
     return [...blanks, ...days];
   }, [view]);
 
-  const slotDays = useMemo(() => {
-    const s = new Set();
-    for (let i = 1; i <= 28; i++) {
-      if (i % 7 !== 0 && i % 6 !== 1) s.add(i);
-    }
-    return s;
-  }, []);
-
-  const prev = () =>
-    setView((v) =>
-      v.month === 0
-        ? { year: v.year - 1, month: 11 }
-        : { ...v, month: v.month - 1 },
-    );
-  const next = () =>
-    setView((v) =>
-      v.month === 11
-        ? { year: v.year + 1, month: 0 }
-        : { ...v, month: v.month + 1 },
-    );
-
-  const isToday = (d) =>
-    d === TODAY.getDate() &&
-    view.month === TODAY.getMonth() &&
-    view.year === TODAY.getFullYear();
-  const isPast = (d) =>
-    new Date(view.year, view.month, d) <
-    new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
-  const dateKey = (d) =>
-    `${view.year}-${String(view.month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  const prev = () => setView(v => v.month === 0 ? { year: v.year - 1, month: 11 } : { ...v, month: v.month - 1 });
+  const next = () => setView(v => v.month === 11 ? { year: v.year + 1, month: 0 } : { ...v, month: v.month + 1 });
+  const isToday = (d) => d === TODAY.getDate() && view.month === TODAY.getMonth() && view.year === TODAY.getFullYear();
+  const isPast = (d) => new Date(view.year, view.month, d) < new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
+  const dateKey = (d) => `${view.year}-${String(view.month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 
   return (
     <div className="bk-calendar-wrap">
       <div className="bk-cal-header">
-        <button className="bk-cal-nav" onClick={prev}>
-          ‹
-        </button>
-        <span className="bk-cal-month">
-          {MONTHS[view.month]} {view.year}
-        </span>
-        <button className="bk-cal-nav" onClick={next}>
-          ›
-        </button>
+        <button className="bk-cal-nav" onClick={prev}>‹</button>
+        <span className="bk-cal-month">{MONTHS[view.month]} {view.year}</span>
+        <button className="bk-cal-nav" onClick={next}>›</button>
       </div>
       <div className="bk-cal-grid">
-        <div className="bk-cal-days-header">
-          {DAYS.map((d) => (
-            <div key={d} className="bk-cal-day-name">
-              {d}
-            </div>
-          ))}
-        </div>
+        <div className="bk-cal-days-header">{DAYS.map(d => <div key={d} className="bk-cal-day-name">{d}</div>)}</div>
         <div className="bk-cal-days">
           {cells.map((d, i) => {
             if (!d) return <div key={i} className="bk-cal-day empty" />;
             const past = isPast(d);
-            const hasSlots = slotDays.has(d) && !past;
             const sel = selected === dateKey(d);
             return (
-              <div
-                key={i}
-                className={`bk-cal-day ${past ? "past" : ""} ${isToday(d) ? "today" : ""} ${hasSlots ? "has-slots" : ""} ${sel ? "selected" : ""}`}
-                onClick={() => !past && hasSlots && onSelect(dateKey(d))}
-              >
+              <div key={i} className={`bk-cal-day ${past ? "past" : ""} ${isToday(d) ? "today" : ""} ${sel ? "selected" : ""}`} onClick={() => !past && onSelect(dateKey(d))}>
                 {d}
-                {hasSlots && <div className="bk-cal-dot" />}
               </div>
             );
           })}
@@ -187,97 +67,40 @@ function Calendar({ selected, onSelect }) {
   );
 }
 
-function SummaryPanel({ step, booking }) {
-  const spec = SPECIALTIES.find((s) => s.name === booking.specialty);
-  const doctor = booking.doctor;
+function SummaryPanel({ booking }) {
+  const spec = SPECIALTIES.find(s => s.name === booking.specialty);
   const fmtDate = (d) => {
     if (!d) return null;
-    const dt = new Date(d + "T00:00:00");
-    return dt.toLocaleDateString("en-GB", {
-      weekday: "short",
-      day: "numeric",
-      month: "long",
-    });
+    return new Date(d + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long" });
   };
-
   return (
     <aside className="bk-right">
       <div className="bk-summary-title">Rezumatul rezervării</div>
-
       <div className="bk-summary-section">
         <div className="bk-summary-label">Specialitate</div>
-        {booking.specialty ? (
-          <div className="bk-summary-val big">
-            {spec?.icon} {booking.specialty}
-          </div>
-        ) : (
-          <div className="bk-summary-placeholder">Nu e selectat încă </div>
-        )}
+        {booking.specialty ? <div className="bk-summary-val big">{spec?.icon} {booking.specialty}</div> : <div className="bk-summary-placeholder">Nu e selectat încă</div>}
       </div>
-
       <div className="bk-summary-section">
         <div className="bk-summary-label">Doctor</div>
-        {doctor ? (
+        {booking.doctor ? (
           <div className="bk-summary-doc-card">
-            <div className="bk-summary-doc-avatar">{doctor.initials}</div>
+            <div className="bk-summary-doc-avatar">{booking.doctor.User.firstName[0]}{booking.doctor.User.lastName[0]}</div>
             <div>
-              <div className="bk-summary-doc-name">{doctor.name}</div>
-              <div className="bk-summary-doc-spec">{doctor.spec}</div>
+              <div className="bk-summary-doc-name">Dr. {booking.doctor.User.firstName} {booking.doctor.User.lastName}</div>
+              <div className="bk-summary-doc-spec">{booking.specialty}</div>
             </div>
           </div>
-        ) : (
-          <div className="bk-summary-placeholder">Nu e selectat încă </div>
-        )}
+        ) : <div className="bk-summary-placeholder">Nu e selectat încă</div>}
       </div>
-
       <div className="bk-summary-section">
         <div className="bk-summary-label">Date & Time</div>
-        {booking.date && booking.time ? (
-          <div className="bk-summary-val">
-            {fmtDate(booking.date)}
-            <br />
-            {booking.time} · {booking.visitType || "In-Person"}
-          </div>
-        ) : booking.date ? (
-          <div className="bk-summary-val">
-            {fmtDate(booking.date)}
-            <br />
-            <span style={{ color: "rgba(255,255,255,0.3)" }}>
-              Ora nu e selectată
-            </span>
-          </div>
-        ) : (
-          <div className="bk-summary-placeholder">Nu e selectat încă </div>
-        )}
+        {booking.date && booking.time ? <div className="bk-summary-val">{fmtDate(booking.date)}<br />{booking.time} · {booking.visitType}</div> : booking.date ? <div className="bk-summary-val">{fmtDate(booking.date)}<br /><span style={{ color: "rgba(255,255,255,0.3)" }}>Ora nu e selectată</span></div> : <div className="bk-summary-placeholder">Nu e selectat încă</div>}
       </div>
-
-      <div className="bk-summary-section">
-        <div className="bk-summary-label">Patient</div>
-        {booking.firstName ? (
-          <div className="bk-summary-val">
-            {booking.firstName} {booking.lastName}
-            <br />
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
-              {booking.email}
-            </span>
-          </div>
-        ) : (
-          <div className="bk-summary-placeholder">Nu e introdus încă </div>
-        )}
-      </div>
-
       <div className="bk-summary-divider" />
-
       <div className="bk-summary-total">
         <div className="bk-summary-total-label">Cost consultație</div>
-        <div className="bk-summary-total-price">
-          {spec ? `£${spec.price}` : "—"}
-        </div>
+        <div className="bk-summary-total-price">{spec ? `${spec.price} Lei` : "—"}</div>
         <div className="bk-summary-total-note">Plata colectată la clinică.</div>
-      </div>
-
-      <div className="bk-summary-help">
-        Aveți nevoie de ajutor? Sunați-ne la <a href="#">+40 721 498 305</a>
       </div>
     </aside>
   );
@@ -288,6 +111,10 @@ const STEPS = ["Specialitate", "Doctor", "Dată & oră", "Detalii"];
 export default function BookAppointment() {
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [doctors, setDoctors] = useState([]);
+  const [busySlots, setBusySlots] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const [booking, setBooking] = useState({
     specialty: "",
@@ -295,144 +122,73 @@ export default function BookAppointment() {
     date: "",
     time: "",
     visitType: "In-Person",
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    dob: "",
-    insurance: "",
-    notes: "",
+    notes: ""
   });
 
-  const set = (key, val) => setBooking((b) => ({ ...b, [key]: val }));
+  useEffect(() => {
+    axios.get("http://localhost:5000/doctors").then(res => setDoctors(res.data));
+  }, []);
 
-  const canNext = [
-    !!booking.specialty,
-    !!booking.doctor,
-    !!(booking.date && booking.time),
-    !!(booking.firstName && booking.lastName && booking.email),
-  ];
+  useEffect(() => {
+    if (booking.doctor && booking.date) {
+      axios.get(`http://localhost:5000/appointments/busy-slots?id_medic=${booking.doctor.id}&date=${booking.date}`)
+        .then(res => setBusySlots(res.data));
+    }
+  }, [booking.doctor, booking.date]);
 
-  const handleSubmit = () => {
-    if (canNext[3]) setSubmitted(true);
+  const filteredDoctors = useMemo(() => {
+    return doctors.filter(d => d.specializare === booking.specialty);
+  }, [doctors, booking.specialty]);
+
+  const set = (key, val) => setBooking(b => ({ ...b, [key]: val }));
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post("http://localhost:5000/appointments/book", {
+        id_medic: booking.doctor.id,
+        specializare: booking.specialty,
+        tip_vizita: booking.visitType,
+        data_programare: booking.date,
+        ora_programare: booking.time,
+        notes: booking.notes
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setSubmitted(true);
+    } catch (err) {
+      alert(err.response?.data?.message || "Error booking appointment");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const refId = `VM-${Math.floor(10000 + Math.random() * 90000)}`;
-  const fmtDate = (d) => {
-    if (!d) return "";
-    const dt = new Date(d + "T00:00:00");
-    return dt.toLocaleDateString("en-GB", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  };
-
-  if (submitted)
-    return (
-      <>
-        <nav className="bk-nav">
-          <a href="/" className="bk-nav-logo">
-            <div className="bk-logo-mark">V</div>
-            <span className="bk-logo-text">
-              Vita<span>Med</span>
-            </span>
-          </a>
-        </nav>
-        <div className="bk-success">
-          <div className="bk-success-card">
-            <div className="bk-success-ring">✓</div>
-            <div className="bk-success-id">Ref: {refId}</div>
-            <h2 className="bk-success-title">
-              Programare <em>confirmată!</em>
-            </h2>
-            <p className="bk-success-sub">
-              Rezervarea dvs. a fost primită. Veți primi un e-mail de confirmare
-              la adresa <strong>{booking.email}</strong> în câteva momente.
-            </p>
-            <div className="bk-success-details">
-              <div>
-                <div className="bk-success-detail-label">Doctor</div>
-                <div className="bk-success-detail-val">
-                  {booking.doctor?.name}
-                </div>
-              </div>
-              <div>
-                <div className="bk-success-detail-label">Specialitate</div>
-                <div className="bk-success-detail-val">{booking.specialty}</div>
-              </div>
-              <div>
-                <div className="bk-success-detail-label">Dată</div>
-                <div className="bk-success-detail-val">
-                  {fmtDate(booking.date)}
-                </div>
-              </div>
-              <div>
-                <div className="bk-success-detail-label">Oră</div>
-                <div className="bk-success-detail-val">
-                  {booking.time} · {booking.visitType}
-                </div>
-              </div>
-            </div>
-            <div className="bk-success-btns">
-              <button
-                className="bk-success-btn-primary"
-                onClick={() => (window.location.href = "/reservations")}
-              >
-                Vezi programăriile mele
-              </button>
-              <button
-                className="bk-success-btn-ghost"
-                onClick={() => {
-                  setSubmitted(false);
-                  setStep(0);
-                  setBooking({
-                    specialty: "",
-                    doctor: null,
-                    date: "",
-                    time: "",
-                    visitType: "In-Person",
-                    firstName: "",
-                    lastName: "",
-                    email: "",
-                    phone: "",
-                    dob: "",
-                    insurance: "",
-                    notes: "",
-                  });
-                }}
-              >
-                Book Another
-              </button>
-            </div>
-          </div>
+  if (submitted) return (
+    <div className="bk-success">
+      <div className="bk-success-card">
+        <div className="bk-success-ring">✓</div>
+        <h2 className="bk-success-title">Programare <em>confirmată!</em></h2>
+        <p className="bk-success-sub">Rezervarea dvs. a fost salvată în sistem.</p>
+        <div className="bk-success-btns">
+          <button className="bk-success-btn-primary" onClick={() => navigate("/manageAppointments")}>Vezi programările mele</button>
+          <button className="bk-success-btn-ghost" onClick={() => navigate("/")}>Acasă</button>
         </div>
-      </>
-    );
+      </div>
+    </div>
+  );
 
   return (
     <>
       <nav className="bk-nav">
         <a href="/" className="bk-nav-logo">
           <div className="bk-logo-mark">V</div>
-          <span className="bk-logo-text">
-            Vita<span>Med</span>
-          </span>
-        </a>
-        <a href="/reservations" className="bk-nav-back">
-          ← Programăriile mele
+          <span className="bk-logo-text">Vita<span>Med</span></span>
         </a>
       </nav>
-
       <div className="bk-page">
         <div className="bk-left">
           <div className="bk-stepper">
             {STEPS.map((label, i) => (
-              <div
-                key={label}
-                className={`bk-step ${i < step ? "done" : ""} ${i === step ? "active" : ""}`}
-              >
+              <div key={label} className={`bk-step ${i < step ? "done" : ""} ${i === step ? "active" : ""}`}>
                 <div className="bk-step-circle">{i < step ? "✓" : i + 1}</div>
                 <div className="bk-step-label">{label}</div>
               </div>
@@ -441,235 +197,88 @@ export default function BookAppointment() {
 
           {step === 0 && (
             <div className="bk-panel">
-              <div className="bk-section-eyebrow">Pasul 1 din 4</div>
-              <h2 className="bk-section-title">
-                Alege o <em>specialitate</em>
-              </h2>
+              <h2 className="bk-section-title">Alege o <em>specialitate</em></h2>
               <div className="bk-specialty-grid">
-                {SPECIALTIES.map((s) => (
-                  <div
-                    key={s.name}
-                    className={`bk-specialty-card ${booking.specialty === s.name ? "selected" : ""}`}
-                    onClick={() => {
-                      set("specialty", s.name);
-                      set("doctor", null);
-                    }}
-                  >
+                {SPECIALTIES.map(s => (
+                  <div key={s.name} className={`bk-specialty-card ${booking.specialty === s.name ? "selected" : ""}`} onClick={() => { set("specialty", s.name); set("doctor", null); }}>
                     <span className="bk-spec-icon">{s.icon}</span>
                     <div className="bk-spec-name">{s.name}</div>
-                    <div className="bk-spec-count">
-                      {s.doctors} specialist · de la {s.price} lei
-                    </div>
+                    <div className="bk-spec-count">{s.price} Lei</div>
                   </div>
                 ))}
               </div>
-              <div className="bk-nav-btns">
-                <button
-                  className="bk-btn-next"
-                  disabled={!canNext[0]}
-                  onClick={() => setStep(1)}
-                >
-                  Continuă →
-                </button>
-              </div>
+              <div className="bk-nav-btns"><button className="bk-btn-next" disabled={!booking.specialty} onClick={() => setStep(1)}>Continuă →</button></div>
             </div>
           )}
 
           {step === 1 && (
             <div className="bk-panel">
-              <div className="bk-section-eyebrow">Pasul 2 din 4</div>
-              <h2 className="bk-section-title">
-                Selectează un <em>doctor</em>
-              </h2>
+              <h2 className="bk-section-title">Selectează un <em>doctor</em></h2>
               <div className="bk-doctor-list">
-                {(DOCTORS[booking.specialty] || []).map((d) => (
-                  <div
-                    key={d.id}
-                    className={`bk-doctor-card ${booking.doctor?.id === d.id ? "selected" : ""}`}
-                    onClick={() => set("doctor", d)}
-                  >
-                    <div className="bk-doc-avatar">{d.initials}</div>
+                {filteredDoctors.map(d => (
+                  <div key={d.id} className={`bk-doctor-card ${booking.doctor?.id === d.id ? "selected" : ""}`} onClick={() => set("doctor", d)}>
+                    <div className="bk-doc-avatar">{d.User.firstName[0]}{d.User.lastName[0]}</div>
                     <div style={{ flex: 1 }}>
-                      <div className="bk-doc-name">{d.name}</div>
-                      <div className="bk-doc-spec">{d.spec}</div>
-                      <div className="bk-doc-meta">
-                        <span className="bk-doc-rating">
-                          <span className="stars">★★★★★</span> {d.rating} (
-                          {d.reviews})
-                        </span>
-                      </div>
-                    </div>
-                    <div className="bk-doc-next">
-                      <div className="bk-doc-next-label">
-                        Următoarea disponibilă
-                      </div>
-                      <div className="bk-doc-next-val">{d.next}</div>
+                      <div className="bk-doc-name">Dr. {d.User.firstName} {d.User.lastName}</div>
+                      <div className="bk-doc-spec">{booking.specialty}</div>
                     </div>
                     <div className="bk-check">✓</div>
                   </div>
                 ))}
               </div>
               <div className="bk-nav-btns">
-                <button className="bk-btn-back" onClick={() => setStep(0)}>
-                  ← Înapoi
-                </button>
-                <button
-                  className="bk-btn-next"
-                  disabled={!canNext[1]}
-                  onClick={() => setStep(2)}
-                >
-                  Continuă →
-                </button>
+                <button className="bk-btn-back" onClick={() => setStep(0)}>← Înapoi</button>
+                <button className="bk-btn-next" disabled={!booking.doctor} onClick={() => setStep(2)}>Continuă →</button>
               </div>
             </div>
           )}
 
           {step === 2 && (
             <div className="bk-panel">
-              <div className="bk-section-eyebrow">Pasul 3 din 4</div>
-              <h2 className="bk-section-title">
-                Selectează o <em>dată & oră</em>
-              </h2>
-
+              <h2 className="bk-section-title">Selectează o <em>dată & oră</em></h2>
               <div className="bk-visit-types" style={{ marginBottom: 28 }}>
-                {VISIT_TYPES.map((t) => (
-                  <div
-                    key={t.name}
-                    className={`bk-visit-type ${booking.visitType === t.name ? "selected" : ""}`}
-                    onClick={() => set("visitType", t.name)}
-                  >
+                {VISIT_TYPES.map(t => (
+                  <div key={t.name} className={`bk-visit-type ${booking.visitType === t.name ? "selected" : ""}`} onClick={() => set("visitType", t.name)}>
                     <span className="bk-visit-type-icon">{t.icon}</span>
                     <div className="bk-visit-type-name">{t.name}</div>
-                    <div className="bk-visit-type-desc">{t.desc}</div>
                   </div>
                 ))}
               </div>
-
-              <Calendar
-                selected={booking.date}
-                onSelect={(d) => {
-                  set("date", d);
-                  set("time", "");
-                }}
-              />
-
+              <Calendar selected={booking.date} onSelect={d => { set("date", d); set("time", ""); }} />
               {booking.date && (
-                <>
-                  <div className="bk-slots-title">Ore disponibile </div>
-                  <div className="bk-slots-grid">
-                    {TIMES.map((t) => (
-                      <div
-                        key={t}
-                        className={`bk-slot ${UNAVAIL.includes(t) ? "unavailable" : ""} ${booking.time === t ? "selected" : ""}`}
-                        onClick={() => !UNAVAIL.includes(t) && set("time", t)}
-                      >
+                <div className="bk-slots-grid" style={{ marginTop: 20 }}>
+                  {TIMES.map(t => {
+                    const isBusy = busySlots.includes(t);
+                    return (
+                      <div key={t} className={`bk-slot ${isBusy ? "unavailable" : ""} ${booking.time === t ? "selected" : ""}`} onClick={() => !isBusy && set("time", t)}>
                         {t}
                       </div>
-                    ))}
-                  </div>
-                </>
+                    );
+                  })}
+                </div>
               )}
-
               <div className="bk-nav-btns">
-                <button className="bk-btn-back" onClick={() => setStep(1)}>
-                  ← Înapoi
-                </button>
-                <button
-                  className="bk-btn-next"
-                  disabled={!canNext[2]}
-                  onClick={() => setStep(3)}
-                >
-                  Continuă →
-                </button>
+                <button className="bk-btn-back" onClick={() => setStep(1)}>← Înapoi</button>
+                <button className="bk-btn-next" disabled={!booking.date || !booking.time} onClick={() => setStep(3)}>Continuă →</button>
               </div>
             </div>
           )}
 
           {step === 3 && (
             <div className="bk-panel">
-              <div className="bk-section-eyebrow">Pasul 4 din 4</div>
-              <h2 className="bk-section-title">
-                Detaliile <em>tale</em>
-              </h2>
-
-              <div className="bk-form-grid" style={{ marginBottom: 16 }}>
-                <div className="bk-field">
-                  <label>First Name *</label>
-                  <input
-                    placeholder="Jane"
-                    value={booking.firstName}
-                    onChange={(e) => set("firstName", e.target.value)}
-                  />
-                </div>
-                <div className="bk-field">
-                  <label>Nume de familie *</label>
-                  <input
-                    placeholder="Doe"
-                    value={booking.lastName}
-                    onChange={(e) => set("lastName", e.target.value)}
-                  />
-                </div>
-                <div className="bk-field">
-                  <label>Adresă de email *</label>
-                  <input
-                    type="email"
-                    placeholder="you@example.com"
-                    value={booking.email}
-                    onChange={(e) => set("email", e.target.value)}
-                  />
-                </div>
-                <div className="bk-field">
-                  <label>Număr de telefon</label>
-                  <input
-                    type="tel"
-                    placeholder="+44 7700 900000"
-                    value={booking.phone}
-                    onChange={(e) => set("phone", e.target.value)}
-                  />
-                </div>
-                <div className="bk-field">
-                  <label>Data nașterii</label>
-                  <input
-                    type="date"
-                    value={booking.dob}
-                    onChange={(e) => set("dob", e.target.value)}
-                  />
-                </div>
-                <div className="bk-field">
-                  <label>Asigurare / Număr Poliță</label>
-                  <input
-                    placeholder="Opțional"
-                    value={booking.insurance}
-                    onChange={(e) => set("insurance", e.target.value)}
-                  />
-                </div>
-                <div className="bk-field full" style={{ gridColumn: "1 / -1" }}>
-                  <label>Motivul programării / Detalii</label>
-                  <textarea
-                    placeholder="Describe your symptoms, previous diagnoses, or anything you'd like the doctor to know…"
-                    value={booking.notes}
-                    onChange={(e) => set("notes", e.target.value)}
-                  />
-                </div>
+              <h2 className="bk-section-title">Detalii <em>suplimentare</em></h2>
+              <div className="bk-field full">
+                <label>Note (opțional)</label>
+                <textarea placeholder="Descrieți simptomele sau orice detalii pe care doriți să le știe medicul..." value={booking.notes} onChange={e => set("notes", e.target.value)} />
               </div>
-
               <div className="bk-nav-btns">
-                <button className="bk-btn-back" onClick={() => setStep(2)}>
-                  ← Back
-                </button>
-                <button
-                  className="bk-btn-submit"
-                  disabled={!canNext[3]}
-                  onClick={handleSubmit}
-                >
-                  Confirmă programarea ✓
-                </button>
+                <button className="bk-btn-back" onClick={() => setStep(2)}>← Înapoi</button>
+                <button className="bk-btn-submit" disabled={loading} onClick={handleSubmit}>{loading ? "Se trimite..." : "Confirmă programarea ✓"}</button>
               </div>
             </div>
           )}
         </div>
-
-        <SummaryPanel step={step} booking={booking} />
+        <SummaryPanel booking={booking} />
       </div>
     </>
   );

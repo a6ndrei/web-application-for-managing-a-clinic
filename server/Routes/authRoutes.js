@@ -1,10 +1,66 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { Op } from "sequelize";
 import Users from "../models/Users.js";
 import Pacient from "../models/Pacient.js";
 
 const router = express.Router();
+
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await Users.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: "Nu există un cont cu această adresă de email." });
+    }
+
+    const token = crypto.randomBytes(20).toString("hex");
+    const expires = Date.now() + 3600000; // 1 ora
+
+    await user.update({
+      resetPasswordToken: token,
+      resetPasswordExpires: expires,
+    });
+
+    // Simulăm trimiterea unui email prin afișarea link-ului în consolă
+    console.log(`Link resetare parolă: http://localhost:5173/reset-password/${token}`);
+
+    res.status(200).json({ message: "Link-ul de resetare a fost trimis pe email." });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.post("/reset-password/:token", async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    const user = await Users.findOne({
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpires: { [Op.gt]: Date.now() },
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Token invalid sau expirat." });
+    }
+
+    const hashPassword = await bcrypt.hash(password, 10);
+    await user.update({
+      parola: hashPassword,
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+    });
+
+    res.status(200).json({ message: "Parola a fost actualizată cu succes." });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 router.post("/register", async (req, res) => {
   const { firstName, lastName, email, password } = req.body;

@@ -13,14 +13,10 @@ const Medic = sequelize.define("Medic", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  email: {
+  specializare: {
     type: DataTypes.STRING,
     allowNull: false,
-  },
-  parola: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
+  }
 });
 
 export default Medic;

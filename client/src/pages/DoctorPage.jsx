@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import "../styles/DoctorPortal.css";
 
-/* ─────────────── Data ─────────────── */
 const DOCTOR = {
   name: "Dr. Elena Marchetti",
   spec: "Cardiology",
@@ -248,7 +247,6 @@ function DeleteModal({ appt, onConfirm, onCancel }) {
   );
 }
 
-/* ─────────────── Main ─────────────── */
 export default function DoctorPortal() {
   const [appts, setAppts] = useState(INITIAL_APPTS);
   const [filter, setFilter] = useState("all");
@@ -311,7 +309,6 @@ export default function DoctorPortal() {
     setToast({ msg: "Appointment deleted", type: "del" });
   };
 
-  // group by date for headers
   const grouped = useMemo(() => {
     const map = {};
     filtered.forEach((a) => {
@@ -453,7 +450,6 @@ export default function DoctorPortal() {
           </div>
 
           <div className="dp-body">
-            {/* ══ Appointment list ══ */}
             <div>
               <div className="dp-list-header">
                 <h2 className="dp-list-title">
@@ -638,9 +634,7 @@ export default function DoctorPortal() {
               )}
             </div>
 
-            {/* ══ Right column ══ */}
             <div className="dp-right">
-              {/* Today's timeline */}
               <div className="dp-schedule-card">
                 <div className="dp-schedule-label">Overview</div>
                 <div className="dp-schedule-title">
@@ -688,7 +682,6 @@ export default function DoctorPortal() {
                 </div>
               </div>
 
-              {/* Patient notes */}
               <div className="dp-notes-card">
                 <div className="dp-notes-title">Quick Patient Notes</div>
                 {PATIENT_NOTES.map((n) => (
@@ -711,7 +704,6 @@ export default function DoctorPortal() {
         </div>
       </div>
 
-      {/* ══ Delete Modal ══ */}
       {modal && (
         <DeleteModal
           appt={modal}
@@ -720,7 +712,6 @@ export default function DoctorPortal() {
         />
       )}
 
-      {/* ══ Toast ══ */}
       {toast && (
         <Toast
           msg={toast.msg}

@@ -22,6 +22,10 @@ const Programari = sequelize.define("Programari", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  tip_vizita: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   data_programare: {
     type: DataTypes.STRING,
     allowNull: false,

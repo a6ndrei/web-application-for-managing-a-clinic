@@ -253,7 +253,7 @@ export default function Login() {
                         />
                         <span className="lf-remember-label">Remember me</span>
                       </label>
-                      <a href="#" className="lf-forgot">
+                      <a href="/forgot-password" className="lf-forgot" onClick={(e) => { e.preventDefault(); navigate("/forgot-password"); }}>
                         Forgot password?
                       </a>
                     </div>

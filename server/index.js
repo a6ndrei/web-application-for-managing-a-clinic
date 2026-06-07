@@ -6,6 +6,8 @@ import Programari from "./models/Programari.js";
 import Medic from "./models/Medic.js";
 import Pacient from "./models/Pacient.js";
 import authRoutes from "./Routes/authRoutes.js";
+import doctorsRoutes from "./Routes/doctorsRoutes.js";
+import appointmentsRoutes from "./Routes/appointmentsRoutes.js";
 
 Users.hasOne(Medic, { foreignKey: "id_user" });
 Medic.belongsTo(Users, { foreignKey: "id_user" });
@@ -26,12 +28,14 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRoutes);
+app.use("/doctors", doctorsRoutes);
+app.use("/appointments", appointmentsRoutes);
 
 async function startServer() {
   try {
     await sequelize.authenticate();
     console.log("Conexiunea la baza de date a fost realizată cu succes");
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
     console.log("Toate modelele au fost sincronizate.");
 
     app.listen(PORT, () => {

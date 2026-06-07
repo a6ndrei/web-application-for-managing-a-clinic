@@ -44,14 +44,14 @@ body { font-family: var(--sans); background: var(--white); color: var(--text); l
 .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 400; transition: color 0.2s; }
 .nav-links a:hover { color: var(--gold); }
 
-.nav-cta {
+.nav-btn-link {
   background: var(--gold); color: var(--navy);
   border: none; padding: 10px 22px; border-radius: var(--radius);
   font-family: var(--sans); font-size: 12px; font-weight: 500;
   letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
   transition: background 0.2s, transform 0.15s;
 }
-.nav-cta:hover { background: var(--gold-lt); transform: translateY(-1px); }
+.nav-btn-link:hover { background: var(--gold-lt); transform: translateY(-1px); }
 
 
 .hero {
