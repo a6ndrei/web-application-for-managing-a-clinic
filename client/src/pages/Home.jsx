@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "../styles/Home.css";
 import { Link, useNavigate } from "react-router";
+import Chatbot from "../components/Chatbot";
 
 const services = [
   {
@@ -145,7 +146,9 @@ export default function Home() {
           </li>
           {token && user.rol === "medic" && (
             <li>
-              <Link to="/manageAppointments">Gestionează toate programările</Link>
+              <Link to="/manageAppointments">
+                Gestionează toate programările
+              </Link>
             </li>
           )}
           {token && user.rol === "admin" && (
@@ -155,7 +158,9 @@ export default function Home() {
           )}
           <li>
             {token ? (
-              <button onClick={handleLogout} className="nav-btn-link">Sign Out</button>
+              <button onClick={handleLogout} className="nav-btn-link">
+                Sign Out
+              </button>
             ) : (
               <Link to="/login">Sign In</Link>
             )}
@@ -223,26 +228,7 @@ export default function Home() {
         </div>
 
         <div className="hero-right">
-          <div className="hero-image-wrap">
-            <div className="hero-image-card">
-              <div className="hero-image-inner">
-                <div className="doctor-silhouette" />
-              </div>
-              <div className="hero-image-placeholder" />
-            </div>
-
-            <div className="hero-badge">
-              <div className="hero-badge-label">Timp mediu de așteptare</div>
-              <div className="hero-badge-val">
-                12 <span>min</span>
-              </div>
-            </div>
-
-            <div className="hero-cert">
-              <div className="hero-cert-label">Acreditare</div>
-              <div className="hero-cert-val">JCI Certificat de aur ✓</div>
-            </div>
-          </div>
+          <Chatbot />
         </div>
       </section>
 

@@ -1,0 +1,131 @@
+.chatbot-container {
+  width: 100%;
+  height: 500px;
+  background: var(--white);
+  border-radius: 8px;
+  border: 1px solid rgba(198, 168, 107, 0.2);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: fadeIn 0.8s ease;
+}
+
+.chatbot-header {
+  background: var(--navy);
+  padding: 16px;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--serif);
+  font-size: 18px;
+  border-bottom: 2px solid var(--gold);
+}
+
+.chatbot-status {
+  width: 10px;
+  height: 10px;
+  background: #4caf50;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #4caf50;
+}
+
+.chatbot-messages {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--cream);
+}
+
+.message {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.message.bot {
+  align-self: flex-start;
+  background: var(--white);
+  color: var(--navy);
+  border-bottom-left-radius: 2px;
+  border: 1px solid rgba(11, 30, 61, 0.05);
+}
+
+.message.user {
+  align-self: flex-end;
+  background: var(--gold);
+  color: var(--navy);
+  border-bottom-right-radius: 2px;
+}
+
+.message.typing {
+  padding: 14px 20px;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  background: var(--muted);
+  border-radius: 50%;
+  animation: typing 1s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(-4px); opacity: 1; }
+}
+
+.chatbot-input {
+  display: flex;
+  padding: 12px;
+  background: var(--white);
+  border-top: 1px solid rgba(11, 30, 61, 0.1);
+  gap: 8px;
+}
+
+.chatbot-input input {
+  flex: 1;
+  border: 1px solid rgba(11, 30, 61, 0.1);
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 14px;
+  outline: none;
+}
+
+.chatbot-input input:focus {
+  border-color: var(--gold);
+}
+
+.chatbot-input button {
+  background: var(--navy);
+  color: var(--white);
+  border: none;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chatbot-input button:hover {
+  background: var(--navy-mid);
+}

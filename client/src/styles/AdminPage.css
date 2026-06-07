@@ -179,7 +179,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); m
 
 .ad-table-head {
   display: grid;
-  grid-template-columns: 28px 1.8fr 1.5fr 1.2fr .9fr .9fr .9fr 100px;
+  grid-template-columns: 28px 1.8fr 1.5fr 1.2fr 1fr 1fr 100px;
   padding: 0 20px; border-bottom: 1px solid var(--border); background: var(--cream);
   position: sticky; top: 64px; z-index: 5;
 }
@@ -195,10 +195,25 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); m
 
 .ad-row {
   display: grid;
-  grid-template-columns: 28px 1.8fr 1.5fr 1.2fr .9fr .9fr .9fr 100px;
+  grid-template-columns: 28px 1.8fr 1.5fr 1.2fr 1fr 1fr 100px;
   padding: 0 20px; border-bottom: 1px solid var(--border);
   align-items: center; cursor: pointer; transition: background .15s;
   animation: fadeUp .35s ease both;
+}
+.ad-row.first-row {
+  background: rgba(198,168,107,0.06);
+  border-left: 3px solid var(--gold);
+  position: relative;
+}
+.ad-row.first-row::before {
+  content: "CEA MAI RECENTĂ";
+  position: absolute;
+  left: 54px;
+  top: 3px;
+  font-size: 7px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.12em;
 }
 .ad-row:last-child { border-bottom: none; }
 .ad-row:hover    { background: rgba(198,168,107,.03); }

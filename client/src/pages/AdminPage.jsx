@@ -324,13 +324,13 @@ export default function AdminAppointments() {
       const mapped = res.data.map(a => ({
         id: a.id,
         patient: {
-          name: `${a.Pacient?.Users?.firstName} ${a.Pacient?.Users?.lastName}`,
-          email: a.Pacient?.Users?.email,
-          initials: (a.Pacient?.Users?.firstName?.[0] || "") + (a.Pacient?.Users?.lastName?.[0] || ""),
+          name: `${a.Pacient?.User?.firstName} ${a.Pacient?.User?.lastName}`,
+          email: a.Pacient?.User?.email,
+          initials: (a.Pacient?.User?.firstName?.[0] || "") + (a.Pacient?.User?.lastName?.[0] || ""),
           color: "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')
         },
         doctor: { 
-          name: `Dr. ${a.Medic?.Users?.firstName} ${a.Medic?.Users?.lastName}`,
+          name: `Dr. ${a.Medic?.User?.firstName} ${a.Medic?.User?.lastName}`,
           spec: a.specializare 
         },
         date: a.data_programare,
@@ -739,7 +739,7 @@ export default function AdminAppointments() {
                   pageSlice.map((a, i) => (
                     <div
                       key={a.id}
-                      className={`ad-row ${selected.has(a.id) ? "selected" : ""} ${a.status === 'Anulată' ? 'cancelled' : ''}`}
+                      className={`ad-row ${i === 0 && page === 1 ? "first-row" : ""} ${selected.has(a.id) ? "selected" : ""} ${a.status === 'Anulată' ? 'cancelled' : ''}`}
                       style={{ animationDelay: `${i * 0.04}s` }}
                       onClick={() => setEditing(a)}
                     >

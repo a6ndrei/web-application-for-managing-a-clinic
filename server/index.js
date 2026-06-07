@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 import sequelize from "./lib/db.js";
+
+dotenv.config();
+
 import Users from "./models/Users.js";
 import Programari from "./models/Programari.js";
 import Medic from "./models/Medic.js";
@@ -9,6 +13,7 @@ import authRoutes from "./Routes/authRoutes.js";
 import doctorsRoutes from "./Routes/doctorsRoutes.js";
 import appointmentsRoutes from "./Routes/appointmentsRoutes.js";
 import adminStatsRoutes from "./Routes/adminStatsRoutes.js";
+import chatRoutes from "./Routes/chatRoutes.js";
 
 Users.hasOne(Medic, { foreignKey: "id_user" });
 Medic.belongsTo(Users, { foreignKey: "id_user" });
@@ -32,6 +37,7 @@ app.use("/auth", authRoutes);
 app.use("/doctors", doctorsRoutes);
 app.use("/appointments", appointmentsRoutes);
 app.use("/stats", adminStatsRoutes);
+app.use("/chat", chatRoutes);
 
 async function startServer() {
   try {
