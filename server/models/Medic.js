@@ -9,6 +9,10 @@ const Medic = sequelize.define("Medic", {
     primaryKey: true,
     autoIncrement: true,
   },
+  id_user: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,

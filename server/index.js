@@ -5,6 +5,7 @@ import Users from "./models/Users.js";
 import Programari from "./models/Programari.js";
 import Medic from "./models/Medic.js";
 import Pacient from "./models/Pacient.js";
+import authRoutes from "./Routes/authRoutes.js";
 
 Users.hasOne(Medic, { foreignKey: "id_user" });
 Medic.belongsTo(Users, { foreignKey: "id_user" });
@@ -23,6 +24,8 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/auth", authRoutes);
 
 async function startServer() {
   try {

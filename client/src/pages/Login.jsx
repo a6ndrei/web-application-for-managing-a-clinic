@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "../styles/Login.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const features = [
   "View and manage your upcoming appointments",
@@ -15,6 +16,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const [loginForm, setLoginForm] = useState({
     email: "",
@@ -31,25 +33,6 @@ export default function Login() {
     confirm: "",
   });
 
-  const handleChangesRegister = (e) => {
-    setRegForm({ ...regForm, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmitRegister = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/auth/register",
-        regForm,
-      );
-      if (response.status === 201) {
-        switchTab("login");
-      }
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-
   const validateLogin = () => {
     const e = {};
     if (!loginForm.email) e.email = "Email is required.";
@@ -61,8 +44,8 @@ export default function Login() {
 
   const validateReg = () => {
     const e = {};
-    if (!regForm.firstName) e.firstName = "Required.";
-    if (!regForm.lastName) e.lastName = "Required.";
+    if (!regForm.firstName) e.firstName = "First name is required.";
+    if (!regForm.lastName) e.lastName = "Last name is required.";
     if (!regForm.email) e.email = "Email is required.";
     else if (!/\S+@\S+\.\S+/.test(regForm.email))
       e.email = "Enter a valid email.";
@@ -73,7 +56,7 @@ export default function Login() {
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = tab === "login" ? validateLogin() : validateReg();
     if (Object.keys(errs).length) {
@@ -82,10 +65,35 @@ export default function Login() {
     }
     setErrors({});
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      if (tab === "login") {
+        const res = await axios.post("http://localhost:5000/auth/login", {
+          email: loginForm.email,
+          password: loginForm.password,
+        });
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        setSuccess(true);
+        setTimeout(() => navigate("/"), 1500);
+      } else {
+        await axios.post("http://localhost:5000/auth/register", {
+          firstName: regForm.firstName,
+          lastName: regForm.lastName,
+          email: regForm.email,
+          password: regForm.password,
+        });
+        setSuccess(true);
+        setTimeout(() => {
+          setSuccess(false);
+          setTab("login");
+        }, 1500);
+      }
+    } catch (err) {
+      setErrors({ server: err.response?.data?.message || "An error occurred" });
+    } finally {
       setLoading(false);
-      setSuccess(true);
-    }, 1800);
+    }
   };
 
   const switchTab = (t) => {
@@ -149,7 +157,7 @@ export default function Login() {
               <p className="lf-success-sub">
                 {tab === "login"
                   ? "You're now signed in to your VitaMed patient portal."
-                  : "Your account is ready. You'll be redirected to your dashboard shortly."}
+                  : "Your account is ready. Please sign in with your new credentials."}
               </p>
             </div>
           ) : (
@@ -173,7 +181,6 @@ export default function Login() {
                 </p>
               </div>
 
-              {/* Tabs */}
               <div className="login-tabs">
                 <button
                   className={`login-tab ${tab === "login" ? "active" : ""}`}
@@ -190,7 +197,9 @@ export default function Login() {
               </div>
 
               <form onSubmit={handleSubmit} noValidate>
-                {/* ── LOGIN FIELDS ── */}
+                {errors.server && (
+                  <div className="lf-error-msg" style={{ marginBottom: 15, color: "red" }}>{errors.server}</div>
+                )}
                 {tab === "login" && (
                   <>
                     <div className="lf-group">
@@ -253,47 +262,39 @@ export default function Login() {
 
                 {tab === "register" && (
                   <>
-                    <div className="lf-row">
-                      {
-                        <div className="lf-group">
-                          <label className="lf-label">First Name</label>
-                          <div className="lf-input-wrap">
-                            <span className="lf-icon">👤</span>
-                            <input
-                              className={`lf-input ${errors.firstName ? "error" : ""}`}
-                              type="text"
-                              placeholder="Jane"
-                              value={regForm.firstName}
-                              onChange={rc("firstName")}
-                            />
-                          </div>
-                          {errors.firstName && (
-                            <span className="lf-error-msg">
-                              {errors.firstName}
-                            </span>
-                          )}
+                    <div className="lf-row" style={{ display: "flex", gap: "15px", marginBottom: "15px" }}>
+                      <div className="lf-group" style={{ flex: 1, marginBottom: 0 }}>
+                        <label className="lf-label">First Name</label>
+                        <div className="lf-input-wrap">
+                          <span className="lf-icon">👤</span>
+                          <input
+                            className={`lf-input ${errors.firstName ? "error" : ""}`}
+                            type="text"
+                            placeholder="John"
+                            value={regForm.firstName}
+                            onChange={rc("firstName")}
+                          />
                         </div>
-                      }
-                      {
-                        <div className="lf-group">
-                          <label className="lf-label">Last Name</label>
-                          <div className="lf-input-wrap">
-                            <span className="lf-icon">👤</span>
-                            <input
-                              className={`lf-input ${errors.lastName ? "error" : ""}`}
-                              type="text"
-                              placeholder="Doe"
-                              value={regForm.lastName}
-                              onChange={rc("lastName")}
-                            />
-                          </div>
-                          {errors.lastName && (
-                            <span className="lf-error-msg">
-                              {errors.lastName}
-                            </span>
-                          )}
+                        {errors.firstName && (
+                          <span className="lf-error-msg">{errors.firstName}</span>
+                        )}
+                      </div>
+                      <div className="lf-group" style={{ flex: 1, marginBottom: 0 }}>
+                        <label className="lf-label">Last Name</label>
+                        <div className="lf-input-wrap">
+                          <span className="lf-icon">👤</span>
+                          <input
+                            className={`lf-input ${errors.lastName ? "error" : ""}`}
+                            type="text"
+                            placeholder="Doe"
+                            value={regForm.lastName}
+                            onChange={rc("lastName")}
+                          />
                         </div>
-                      }
+                        {errors.lastName && (
+                          <span className="lf-error-msg">{errors.lastName}</span>
+                        )}
+                      </div>
                     </div>
                     <div className="lf-group">
                       <label className="lf-label">Email Address</label>

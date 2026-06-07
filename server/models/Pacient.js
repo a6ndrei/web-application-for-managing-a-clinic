@@ -10,6 +10,10 @@ const Pacient = sequelize.define("Pacient", {
     primaryKey: true,
     autoIncrement: true,
   },
+  id_user: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,

@@ -85,6 +85,14 @@ const whyFeatures = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -128,6 +136,13 @@ export default function Home() {
           </li>
           <li>
             <Link to="/manageAppointments">Afișează programările</Link>
+          </li>
+          <li>
+            {token ? (
+              <button onClick={handleLogout} className="nav-btn-link">Sign Out</button>
+            ) : (
+              <Link to="/login">Sign In</Link>
+            )}
           </li>
         </ul>
       </nav>
