@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "../styles/Login.css";
+import axios from "axios";
 
 const features = [
   "View and manage your upcoming appointments",
@@ -8,20 +9,19 @@ const features = [
 ];
 
 export default function Login() {
-  const [tab, setTab] = useState("login"); // "login" | "register"
+  const [tab, setTab] = useState("login");
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // login fields
   const [loginForm, setLoginForm] = useState({
     email: "",
     password: "",
     remember: false,
   });
-  // register fields
+
   const [regForm, setRegForm] = useState({
     firstName: "",
     lastName: "",
@@ -31,7 +31,25 @@ export default function Login() {
     confirm: "",
   });
 
-  /* ── Validation ── */
+  const handleChangesRegister = (e) => {
+    setRegForm({ ...regForm, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmitRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/auth/register",
+        regForm,
+      );
+      if (response.status === 201) {
+        switchTab("login");
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   const validateLogin = () => {
     const e = {};
     if (!loginForm.email) e.email = "Email is required.";
@@ -55,7 +73,6 @@ export default function Login() {
     return e;
   };
 
-  /* ── Submit ── */
   const handleSubmit = (e) => {
     e.preventDefault();
     const errs = tab === "login" ? validateLogin() : validateReg();
@@ -77,7 +94,6 @@ export default function Login() {
     setSuccess(false);
   };
 
-  /* ── Field helpers ── */
   const lc = (k) => (e) =>
     setLoginForm({
       ...loginForm,
@@ -87,7 +103,6 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      {/* ── Left decorative panel ── */}
       <div className="login-left">
         <a href="/" className="login-left-logo">
           <div className="login-logo-mark">V</div>
@@ -123,7 +138,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* ── Right form panel ── */}
       <div className="login-right">
         <div className="login-card">
           {success ? (
@@ -237,48 +251,50 @@ export default function Login() {
                   </>
                 )}
 
-                {/* ── REGISTER FIELDS ── */}
                 {tab === "register" && (
                   <>
                     <div className="lf-row">
-                      <div className="lf-group">
-                        <label className="lf-label">First Name</label>
-                        <div className="lf-input-wrap">
-                          <span className="lf-icon">👤</span>
-                          <input
-                            className={`lf-input ${errors.firstName ? "error" : ""}`}
-                            type="text"
-                            placeholder="Jane"
-                            value={regForm.firstName}
-                            onChange={rc("firstName")}
-                          />
+                      {
+                        <div className="lf-group">
+                          <label className="lf-label">First Name</label>
+                          <div className="lf-input-wrap">
+                            <span className="lf-icon">👤</span>
+                            <input
+                              className={`lf-input ${errors.firstName ? "error" : ""}`}
+                              type="text"
+                              placeholder="Jane"
+                              value={regForm.firstName}
+                              onChange={rc("firstName")}
+                            />
+                          </div>
+                          {errors.firstName && (
+                            <span className="lf-error-msg">
+                              {errors.firstName}
+                            </span>
+                          )}
                         </div>
-                        {errors.firstName && (
-                          <span className="lf-error-msg">
-                            {errors.firstName}
-                          </span>
-                        )}
-                      </div>
-                      <div className="lf-group">
-                        <label className="lf-label">Last Name</label>
-                        <div className="lf-input-wrap">
-                          <span className="lf-icon">👤</span>
-                          <input
-                            className={`lf-input ${errors.lastName ? "error" : ""}`}
-                            type="text"
-                            placeholder="Doe"
-                            value={regForm.lastName}
-                            onChange={rc("lastName")}
-                          />
+                      }
+                      {
+                        <div className="lf-group">
+                          <label className="lf-label">Last Name</label>
+                          <div className="lf-input-wrap">
+                            <span className="lf-icon">👤</span>
+                            <input
+                              className={`lf-input ${errors.lastName ? "error" : ""}`}
+                              type="text"
+                              placeholder="Doe"
+                              value={regForm.lastName}
+                              onChange={rc("lastName")}
+                            />
+                          </div>
+                          {errors.lastName && (
+                            <span className="lf-error-msg">
+                              {errors.lastName}
+                            </span>
+                          )}
                         </div>
-                        {errors.lastName && (
-                          <span className="lf-error-msg">
-                            {errors.lastName}
-                          </span>
-                        )}
-                      </div>
+                      }
                     </div>
-
                     <div className="lf-group">
                       <label className="lf-label">Email Address</label>
                       <div className="lf-input-wrap">
@@ -360,7 +376,6 @@ export default function Login() {
                   </>
                 )}
 
-                {/* Submit */}
                 <button type="submit" className="lf-submit" disabled={loading}>
                   {loading ? (
                     <span className="lf-submit-loading">
@@ -375,7 +390,6 @@ export default function Login() {
                 </button>
               </form>
 
-              {/* Social login (login tab only) */}
               {tab === "login" && (
                 <>
                   <div className="lf-divider">

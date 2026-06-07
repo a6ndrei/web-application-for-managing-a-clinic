@@ -234,9 +234,9 @@ export default function ManageAppointments() {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("date-asc");
-  const [view, setView] = useState("cards"); // "cards" | "table"
-  const [modal, setModal] = useState(null); // { action, appt }
-  const [toast, setToast] = useState(null); // { msg, type }
+  const [view, setView] = useState("cards");
+  const [modal, setModal] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const counts = useMemo(() => {
     const c = { all: appts.length };

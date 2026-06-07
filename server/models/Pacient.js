@@ -1,5 +1,8 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../lib/db.js";
+import sequelize from "../lib/db.js";
+import Medic from "./Medic.js";
+import Users from "./Users.js";
+import Programari from "./Programari.js";
 
 const Pacient = sequelize.define("Pacient", {
   id: {
@@ -12,10 +15,6 @@ const Pacient = sequelize.define("Pacient", {
     allowNull: false,
   },
   parola: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  rol: {
     type: DataTypes.STRING,
     allowNull: false,
   },

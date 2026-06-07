@@ -1,5 +1,7 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../lib/db.js";
+import sequelize from "../lib/db.js";
+import Users from "./Users.js";
+import Programari from "./Programari.js";
 
 const Medic = sequelize.define("Medic", {
   id: {
@@ -15,12 +17,6 @@ const Medic = sequelize.define("Medic", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  rol: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
 });
-Medic.hasMany(Programari, { foreignKey: "id_medic" });
-Medic.hasMany(Pacient, { foreignKey: "id_medic" });
 
 export default Medic;

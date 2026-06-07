@@ -130,16 +130,6 @@ export default function Home() {
             <Link to="/manageAppointments">Afișează programările</Link>
           </li>
         </ul>
-        <button
-          className="nav-cta"
-          onClick={() =>
-            document
-              .getElementById("booking")
-              .scrollIntoView({ behavior: "smooth" })
-          }
-        >
-          Programează o consultație
-        </button>
       </nav>
 
       <section className="hero">
@@ -529,12 +519,6 @@ export default function Home() {
             )}
           </form>
         </div>
-        <button
-          className="reservation-button"
-          onClick={() => navigate("/login")}
-        >
-          Programează o consultație
-        </button>
       </section>
 
       <footer className="footer" id="contact">
@@ -588,13 +572,6 @@ export default function Home() {
           <span className="footer-copy">
             © 2025 VitaMed. All rights reserved.
           </span>
-          <div className="footer-socials">
-            {["𝕏", "in", "f", "ig"].map((s) => (
-              <a key={s} href="#" className="footer-social">
-                {s}
-              </a>
-            ))}
-          </div>
         </div>
       </footer>
     </>

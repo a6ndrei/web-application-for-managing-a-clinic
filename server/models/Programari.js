@@ -1,5 +1,8 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../lib/db.js";
+import sequelize from "../lib/db.js";
+import Users from "./Users.js";
+import Medic from "./Medic.js";
+import Pacient from "./Pacient.js";
 
 const Programari = sequelize.define("Programari", {
   id: {
@@ -19,10 +22,6 @@ const Programari = sequelize.define("Programari", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  email_pacient: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
   data_programare: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -31,9 +30,13 @@ const Programari = sequelize.define("Programari", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  email_medic: {
+  status: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  notes: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
 });
 
