@@ -1,275 +1,13 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import "../styles/AdminAppointments.css";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { 
+  PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line 
+} from "recharts";
+import "../styles/AdminPage.css";
 
-const SEED = [
-  {
-    id: "APT-1001",
-    patient: {
-      name: "Margaret Liu",
-      email: "m.liu@email.com",
-      initials: "ML",
-      color: "#D9C49A",
-    },
-    doctor: { name: "Dr. Elena Marchetti", spec: "Cardiology" },
-    date: "2026-05-18",
-    time: "10:00 AM",
-    duration: "45 min",
-    type: "Consultation",
-    status: "pending",
-    room: "Suite 3B",
-    note: "Chest tightness, EKG review needed.",
-  },
-  {
-    id: "APT-1002",
-    patient: {
-      name: "Thomas Bauer",
-      email: "t.bauer@email.com",
-      initials: "TB",
-      color: "#A8C4D9",
-    },
-    doctor: { name: "Dr. James Okafor", spec: "Neurology" },
-    date: "2026-05-18",
-    time: "11:30 AM",
-    duration: "30 min",
-    type: "Follow-up",
-    status: "accepted",
-    room: "Suite 1A",
-    note: "Post-MRI, discuss April scan findings.",
-  },
-  {
-    id: "APT-1003",
-    patient: {
-      name: "Isabelle Fontaine",
-      email: "i.fontaine@email.com",
-      initials: "IF",
-      color: "#D4A8C7",
-    },
-    doctor: { name: "Dr. Sophia Reyes", spec: "Orthopedics" },
-    date: "2026-05-19",
-    time: "2:00 PM",
-    duration: "60 min",
-    type: "Consultation",
-    status: "accepted",
-    room: "Suite 5C",
-    note: "Knee replacement pre-op assessment.",
-  },
-  {
-    id: "APT-1004",
-    patient: {
-      name: "David Osei",
-      email: "d.osei@email.com",
-      initials: "DO",
-      color: "#A8D4B8",
-    },
-    doctor: { name: "Dr. Alan Voss", spec: "Int. Medicine" },
-    date: "2026-05-19",
-    time: "9:00 AM",
-    duration: "45 min",
-    type: "Annual Check-up",
-    status: "accepted",
-    room: "Suite 2D",
-    note: "Routine annual exam, blood panel ordered.",
-  },
-  {
-    id: "APT-1005",
-    patient: {
-      name: "Priya Nair",
-      email: "p.nair@email.com",
-      initials: "PN",
-      color: "#F0C8A0",
-    },
-    doctor: { name: "Dr. Elena Marchetti", spec: "Cardiology" },
-    date: "2026-05-20",
-    time: "3:30 PM",
-    duration: "45 min",
-    type: "Consultation",
-    status: "declined",
-    room: "Suite 3B",
-    note: "Rescheduling requested for May 25.",
-  },
-  {
-    id: "APT-1006",
-    patient: {
-      name: "Carlos Mendez",
-      email: "c.mendez@email.com",
-      initials: "CM",
-      color: "#C8B4E8",
-    },
-    doctor: { name: "Dr. James Okafor", spec: "Neurology" },
-    date: "2026-05-20",
-    time: "10:30 AM",
-    duration: "30 min",
-    type: "Follow-up",
-    status: "pending",
-    room: "Suite 1A",
-    note: "Insurance pre-auth pending.",
-  },
-  {
-    id: "APT-1007",
-    patient: {
-      name: "Saoirse Kelly",
-      email: "s.kelly@email.com",
-      initials: "SK",
-      color: "#F0D4A8",
-    },
-    doctor: { name: "Dr. Sophia Reyes", spec: "Orthopedics" },
-    date: "2026-05-21",
-    time: "1:00 PM",
-    duration: "45 min",
-    type: "Consultation",
-    status: "pending",
-    room: "Suite 5C",
-    note: "New patient referral. L4-L5 disc involvement.",
-  },
-  {
-    id: "APT-1008",
-    patient: {
-      name: "Wei Zhang",
-      email: "w.zhang@email.com",
-      initials: "WZ",
-      color: "#A8D4D0",
-    },
-    doctor: { name: "Dr. Alan Voss", spec: "Int. Medicine" },
-    date: "2026-05-22",
-    time: "8:00 AM",
-    duration: "20 min",
-    type: "Lab Review",
-    status: "accepted",
-    room: "Suite 2D",
-    note: "Q2 blood panel and thyroid review.",
-  },
-  {
-    id: "APT-1009",
-    patient: {
-      name: "Nadia Petrov",
-      email: "n.petrov@email.com",
-      initials: "NP",
-      color: "#EAD4A8",
-    },
-    doctor: { name: "Dr. Claire Dupont", spec: "Ophthalmology" },
-    date: "2026-05-22",
-    time: "4:00 PM",
-    duration: "45 min",
-    type: "Consultation",
-    status: "pending",
-    room: "Suite 6A",
-    note: "Vision decline, possible early glaucoma.",
-  },
-  {
-    id: "APT-1010",
-    patient: {
-      name: "Luca Ferretti",
-      email: "l.ferretti@email.com",
-      initials: "LF",
-      color: "#C8D4E8",
-    },
-    doctor: { name: "Dr. Nadia Petrov", spec: "Dermatology" },
-    date: "2026-05-23",
-    time: "11:00 AM",
-    duration: "30 min",
-    type: "Consultation",
-    status: "pending",
-    room: "Suite 4B",
-    note: "Persistent forearm rash, possible psoriasis.",
-  },
-  {
-    id: "APT-1011",
-    patient: {
-      name: "Amara Okonkwo",
-      email: "a.okonkwo@email.com",
-      initials: "AO",
-      color: "#B8D4C8",
-    },
-    doctor: { name: "Dr. Yuki Tanaka", spec: "Int. Medicine" },
-    date: "2026-05-23",
-    time: "9:30 AM",
-    duration: "30 min",
-    type: "Follow-up",
-    status: "accepted",
-    room: "Suite 2D",
-    note: "Hypertension management, medication review.",
-  },
-  {
-    id: "APT-1012",
-    patient: {
-      name: "François Dubois",
-      email: "f.dubois@email.com",
-      initials: "FD",
-      color: "#D4C8E8",
-    },
-    doctor: { name: "Dr. Lena Hoffmann", spec: "Neurology" },
-    date: "2026-05-24",
-    time: "10:00 AM",
-    duration: "45 min",
-    type: "Consultation",
-    status: "pending",
-    room: "Suite 1A",
-    note: "Recurring migraines, trigger assessment.",
-  },
-  {
-    id: "APT-1013",
-    patient: {
-      name: "Yuki Nakamura",
-      email: "y.nakamura@email.com",
-      initials: "YN",
-      color: "#E8D4C8",
-    },
-    doctor: { name: "Dr. Sophia Reyes", spec: "Orthopedics" },
-    date: "2026-05-24",
-    time: "2:30 PM",
-    duration: "60 min",
-    type: "Procedure",
-    status: "accepted",
-    room: "Suite 5C",
-    note: "Cortisone injection, right shoulder.",
-  },
-  {
-    id: "APT-1014",
-    patient: {
-      name: "Elena Rossi",
-      email: "e.rossi@email.com",
-      initials: "ER",
-      color: "#C8E8D4",
-    },
-    doctor: { name: "Dr. Elena Marchetti", spec: "Cardiology" },
-    date: "2026-05-25",
-    time: "8:30 AM",
-    duration: "30 min",
-    type: "Results Review",
-    status: "declined",
-    room: "Suite 3B",
-    note: "Stress test results review, rescheduled.",
-  },
-  {
-    id: "APT-1015",
-    patient: {
-      name: "Omar Hassan",
-      email: "o.hassan@email.com",
-      initials: "OH",
-      color: "#E8C8D4",
-    },
-    doctor: { name: "Dr. Marcus Webb", spec: "Orthopedics" },
-    date: "2026-05-25",
-    time: "11:30 AM",
-    duration: "45 min",
-    type: "Consultation",
-    status: "pending",
-    room: "Suite 5C",
-    note: "Chronic knee pain, MRI referral requested.",
-  },
-];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d"];
 
-const DOCTORS = [
-  "Dr. Elena Marchetti",
-  "Dr. James Okafor",
-  "Dr. Sophia Reyes",
-  "Dr. Alan Voss",
-  "Dr. Claire Dupont",
-  "Dr. Nadia Petrov",
-  "Dr. Yuki Tanaka",
-  "Dr. Lena Hoffmann",
-  "Dr. Marcus Webb",
-];
 const ROOMS = [
   "Suite 1A",
   "Suite 2D",
@@ -279,34 +17,33 @@ const ROOMS = [
   "Suite 6A",
 ];
 const TYPES = [
-  "Consultation",
-  "Follow-up",
-  "Annual Check-up",
-  "Lab Review",
-  "Procedure",
-  "Results Review",
+  "Consultație",
+  "Control",
+  "Urgență",
 ];
-const STATUSES = ["pending", "accepted", "declined"];
-const FILTERS = ["all", "pending", "accepted", "declined"];
+const STATUSES = ["Programată", "Anulată", "Finalizată"];
+const FILTERS = ["all", "Programată", "Anulată", "Finalizată"];
 const PAGE_SIZE = 8;
 
 const NAV_ITEMS = [
   { icon: "🏠", label: "Dashboard", badge: null },
-  { icon: "📋", label: "Appointments", badge: "5", active: true },
-  { icon: "👥", label: "Patients", badge: null },
-  { icon: "👨‍⚕️", label: "Doctors", badge: null },
-  { icon: "🧪", label: "Lab Results", badge: "2" },
-  { icon: "📊", label: "Reports", badge: null },
-  { icon: "⚙️", label: "Settings", badge: null },
+  { icon: "📋", label: "Programări", badge: null, active: true },
+  { icon: "👥", label: "Pacienți", badge: null },
+  { icon: "👨‍⚕️", label: "Medici", badge: null },
 ];
 
-const fmtDate = (d) =>
-  new Date(d + "T00:00:00").toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-const fmtDateInput = (d) => d; 
+const fmtDate = (d) => {
+  if (!d) return "";
+  try {
+    return new Date(d).toLocaleDateString("ro-RO", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  } catch (e) {
+    return d;
+  }
+};
 
 function Toast({ msg, icon, onDone }) {
   useEffect(() => {
@@ -325,11 +62,11 @@ function Toast({ msg, icon, onDone }) {
 
 function DeleteModal({ target, onConfirm, onCancel }) {
   const names = Array.isArray(target) ? (
-    `${target.length} appointment${target.length > 1 ? "s" : ""}`
+    `${target.length} programări`
   ) : (
     <>
-      <span className="ad-modal-name">{target.patient.name}</span> on{" "}
-      {fmtDate(target.date)} at {target.time}
+      <span className="ad-modal-name">{target.patient.name}</span> pe data de{" "}
+      {fmtDate(target.date)} la {target.time}
     </>
   );
   return (
@@ -337,17 +74,17 @@ function DeleteModal({ target, onConfirm, onCancel }) {
       <div className="ad-modal" onClick={(e) => e.stopPropagation()}>
         <div className="ad-modal-icon">🗑️</div>
         <div className="ad-modal-title">
-          {Array.isArray(target) ? "Bulk delete" : "Delete appointment"}
+          {Array.isArray(target) ? "Ștergere multiplă" : "Șterge programarea"}
         </div>
         <p className="ad-modal-sub">
-          This will permanently remove {names}. This action cannot be undone.
+          Sigur doriți să ștergeți {names}? Această acțiune este permanentă.
         </p>
         <div className="ad-modal-btns">
           <button className="ad-mc" onClick={onCancel}>
-            Cancel
+            Anulează
           </button>
           <button className="ad-mok" onClick={onConfirm}>
-            Delete
+            Șterge
           </button>
         </div>
       </div>
@@ -359,12 +96,8 @@ function EditDrawer({ appt, onSave, onDelete, onClose }) {
   const [form, setForm] = useState({
     date: appt.date,
     time: appt.time,
-    duration: appt.duration,
-    doctor: appt.doctor.name,
-    room: appt.room,
-    type: appt.type,
     status: appt.status,
-    note: appt.note,
+    note: appt.note || "",
   });
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -374,8 +107,8 @@ function EditDrawer({ appt, onSave, onDelete, onClose }) {
       <aside className="ad-drawer">
         <div className="ad-drawer-head">
           <div>
-            <div className="ad-drawer-title">Edit Appointment</div>
-            <div className="ad-drawer-sub">{appt.id}</div>
+            <div className="ad-drawer-title">Gestionează Programarea</div>
+            <div className="ad-drawer-sub">ID: #{appt.id}</div>
           </div>
           <button className="ad-drawer-close" onClick={onClose}>
             ✕
@@ -384,7 +117,7 @@ function EditDrawer({ appt, onSave, onDelete, onClose }) {
 
         <div className="ad-drawer-body">
           <div className="ad-ds">
-            <div className="ad-ds-title">Patient</div>
+            <div className="ad-ds-title">Pacient</div>
             <div className="ad-pat-info-card">
               <div
                 className="ad-pat-info-av"
@@ -395,107 +128,13 @@ function EditDrawer({ appt, onSave, onDelete, onClose }) {
               <div>
                 <div className="ad-pat-info-name">{appt.patient.name}</div>
                 <div className="ad-pat-info-email">{appt.patient.email}</div>
-                <div className="ad-pat-info-id">
-                  Read-only · to reassign, delete and rebook
-                </div>
               </div>
             </div>
           </div>
 
           <div className="ad-ds">
-            <div className="ad-ds-title">Schedule</div>
+            <div className="ad-ds-title">Status Programare</div>
             <div className="ad-form-row">
-              <div className="ad-field">
-                <label>Date</label>
-                <input
-                  className="ad-input"
-                  type="date"
-                  value={form.date}
-                  onChange={(e) => set("date", e.target.value)}
-                />
-              </div>
-              <div className="ad-field">
-                <label>Time</label>
-                <select
-                  className="ad-input"
-                  value={form.time}
-                  onChange={(e) => set("time", e.target.value)}
-                >
-                  {[
-                    "8:00 AM",
-                    "8:30 AM",
-                    "9:00 AM",
-                    "9:30 AM",
-                    "10:00 AM",
-                    "10:30 AM",
-                    "11:00 AM",
-                    "11:30 AM",
-                    "12:00 PM",
-                    "1:00 PM",
-                    "1:30 PM",
-                    "2:00 PM",
-                    "2:30 PM",
-                    "3:00 PM",
-                    "3:30 PM",
-                    "4:00 PM",
-                    "4:30 PM",
-                    "5:00 PM",
-                  ].map((t) => (
-                    <option key={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="ad-form-row">
-              <div className="ad-field">
-                <label>Duration</label>
-                <select
-                  className="ad-input"
-                  value={form.duration}
-                  onChange={(e) => set("duration", e.target.value)}
-                >
-                  {[
-                    "15 min",
-                    "20 min",
-                    "30 min",
-                    "45 min",
-                    "60 min",
-                    "90 min",
-                  ].map((d) => (
-                    <option key={d}>{d}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="ad-field">
-                <label>Room</label>
-                <select
-                  className="ad-input"
-                  value={form.room}
-                  onChange={(e) => set("room", e.target.value)}
-                >
-                  {ROOMS.map((r) => (
-                    <option key={r}>{r}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="ad-ds">
-            <div className="ad-ds-title">Appointment</div>
-            <div className="ad-form-row">
-              <div className="ad-field">
-                <label>Type</label>
-                <select
-                  className="ad-input"
-                  value={form.type}
-                  onChange={(e) => set("type", e.target.value)}
-                >
-                  {TYPES.map((t) => (
-                    <option key={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
               <div className="ad-field">
                 <label>Status</label>
                 <select
@@ -504,8 +143,8 @@ function EditDrawer({ appt, onSave, onDelete, onClose }) {
                   onChange={(e) => set("status", e.target.value)}
                 >
                   {STATUSES.map((s) => (
-                    <option key={s}>
-                      {s.charAt(0).toUpperCase() + s.slice(1)}
+                    <option key={s} value={s}>
+                      {s}
                     </option>
                   ))}
                 </select>
@@ -513,26 +152,27 @@ function EditDrawer({ appt, onSave, onDelete, onClose }) {
             </div>
             <div className="ad-form-row full">
               <div className="ad-field">
-                <label>Assigned Doctor</label>
-                <select
-                  className="ad-input"
-                  value={form.doctor}
-                  onChange={(e) => set("doctor", e.target.value)}
-                >
-                  {DOCTORS.map((d) => (
-                    <option key={d}>{d}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="ad-form-row full">
-              <div className="ad-field">
-                <label>Clinical Notes</label>
+                <label>Note Administrative</label>
                 <textarea
                   className="ad-input ad-textarea"
                   value={form.note}
                   onChange={(e) => set("note", e.target.value)}
+                  placeholder="Note interne despre această programare..."
                 />
+              </div>
+            </div>
+          </div>
+          
+          <div className="ad-ds">
+            <div className="ad-ds-title">Detalii (Citire)</div>
+            <div className="ad-form-row">
+              <div className="ad-field">
+                <label>Medic</label>
+                <input className="ad-input" value={appt.doctor.name} readOnly />
+              </div>
+              <div className="ad-field">
+                <label>Data/Ora</label>
+                <input className="ad-input" value={`${fmtDate(appt.date)} - ${appt.time}`} readOnly />
               </div>
             </div>
           </div>
@@ -540,13 +180,13 @@ function EditDrawer({ appt, onSave, onDelete, onClose }) {
 
         <div className="ad-drawer-foot">
           <button className="ad-df-btn save" onClick={() => onSave(form)}>
-            Save Changes
+            Actualizează Status
           </button>
           <button className="ad-df-btn cancel" onClick={onClose}>
-            Cancel
+            Închide
           </button>
           <button className="ad-df-btn del" onClick={onDelete}>
-            Delete
+            Șterge
           </button>
         </div>
       </aside>
@@ -559,16 +199,179 @@ function SortIcon({ col, sort }) {
   return <span className="ad-sort-icon">{sort.dir === "asc" ? "↑" : "↓"}</span>;
 }
 
+function DashboardView({ stats, predictions }) {
+  if (!stats) return <div className="ad-empty">Se încarcă statisticile...</div>;
+
+  const statusData = stats.byStatus.map(s => ({ name: s.status, value: parseInt(s.count) }));
+  const specData = stats.bySpecialty.map(s => ({ name: s.specializare, value: parseInt(s.count) }));
+  const hourData = stats.byHour.map(h => ({ hour: h.ora_programare, count: parseInt(h.count) }));
+  const predictionData = predictions?.next7Days.map(p => ({ day: p.dayName, predicted: p.predictedCount })) || [];
+
+  return (
+    <div className="ad-dashboard-grid">
+      <div className="ad-dash-card full">
+        <div className="ad-dash-card-title">Previziuni Volum Programări (Săptămâna Viitoare)</div>
+        <div className="ad-dash-card-sub">Bazat pe media istorică: {predictions?.dailyAverage} programări/zi</div>
+        <div style={{ width: '100%', height: 300 }}>
+          <ResponsiveContainer>
+            <BarChart data={predictionData}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
+              <XAxis dataKey="day" stroke="rgba(255,255,255,0.5)" />
+              <YAxis stroke="rgba(255,255,255,0.5)" />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#1a1d21', border: '1px solid #333', borderRadius: '8px' }}
+                itemStyle={{ color: '#fff' }}
+              />
+              <Bar dataKey="predicted" fill="#4f46e5" radius={[4, 4, 0, 0]} name="Nr. Estimat" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="ad-dash-card">
+        <div className="ad-dash-card-title">Distribuție Specializări</div>
+        <div style={{ width: '100%', height: 250 }}>
+          <ResponsiveContainer>
+            <PieChart>
+              <Pie
+                data={specData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={80}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {specData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend verticalAlign="bottom" height={36}/>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="ad-dash-card">
+        <div className="ad-dash-card-title">Status Programări</div>
+        <div style={{ width: '100%', height: 250 }}>
+          <ResponsiveContainer>
+            <PieChart>
+              <Pie
+                data={statusData}
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                dataKey="value"
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              >
+                {statusData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="ad-dash-card full">
+        <div className="ad-dash-card-title">Activitate pe Ore (Istoric)</div>
+        <div style={{ width: '100%', height: 250 }}>
+          <ResponsiveContainer>
+            <LineChart data={hourData}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
+              <XAxis dataKey="hour" stroke="rgba(255,255,255,0.5)" />
+              <YAxis stroke="rgba(255,255,255,0.5)" />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#1a1d21', border: '1px solid #333', borderRadius: '8px' }}
+              />
+              <Line type="monotone" dataKey="count" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} name="Total Programări" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminAppointments() {
-  const [appts, setAppts] = useState(SEED);
+  const [activeTab, setActiveTab] = useState("Programări");
+  const [stats, setStats] = useState(null);
+  const [predictions, setPredictions] = useState(null);
+  const [appts, setAppts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState({ col: "date", dir: "asc" });
+  const [sort, setSort] = useState({ col: "date", dir: "desc" });
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(new Set()); 
   const [editing, setEditing] = useState(null); 
   const [delTarget, setDelTarget] = useState(null); 
   const [toast, setToast] = useState(null);
+  
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const fetchAppts = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get("http://localhost:5000/appointments/all", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const mapped = res.data.map(a => ({
+        id: a.id,
+        patient: {
+          name: `${a.Pacient?.Users?.firstName} ${a.Pacient?.Users?.lastName}`,
+          email: a.Pacient?.Users?.email,
+          initials: (a.Pacient?.Users?.firstName?.[0] || "") + (a.Pacient?.Users?.lastName?.[0] || ""),
+          color: "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')
+        },
+        doctor: { 
+          name: `Dr. ${a.Medic?.Users?.firstName} ${a.Medic?.Users?.lastName}`,
+          spec: a.specializare 
+        },
+        date: a.data_programare,
+        time: a.ora_programare,
+        type: a.tip_vizita,
+        status: a.status,
+        note: a.notes,
+      }));
+      
+      setAppts(mapped);
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const [sRes, pRes] = await Promise.all([
+        axios.get("http://localhost:5000/stats/global", { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get("http://localhost:5000/stats/predictions", { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      setStats(sRes.data);
+      setPredictions(pRes.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAppts();
+    fetchStats();
+  }, [fetchAppts, fetchStats]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   const counts = useMemo(() => {
     const c = { all: appts.length };
@@ -588,7 +391,7 @@ export default function AdminAppointments() {
           a.patient.name.toLowerCase().includes(q) ||
           a.doctor.name.toLowerCase().includes(q) ||
           a.doctor.spec.toLowerCase().includes(q) ||
-          a.id.toLowerCase().includes(q) ||
+          a.id.toString().includes(q) ||
           a.type.toLowerCase().includes(q),
       );
     }
@@ -606,10 +409,6 @@ export default function AdminAppointments() {
         case "doctor":
           va = a.doctor.name;
           vb = b.doctor.name;
-          break;
-        case "type":
-          va = a.type;
-          vb = b.type;
           break;
         case "status":
           va = a.status;
@@ -663,89 +462,119 @@ export default function AdminAppointments() {
     });
   }, []);
 
-  const saveEdit = (form) => {
-    setAppts((prev) =>
-      prev.map((a) => {
-        if (a.id !== editing.id) return a;
-        return {
-          ...a,
-          date: form.date,
-          time: form.time,
-          duration: form.duration,
-          room: form.room,
-          type: form.type,
-          status: form.status,
-          note: form.note,
-          doctor: { ...a.doctor, name: form.doctor },
-        };
-      }),
-    );
-    setEditing(null);
-    setToast({ msg: "Appointment updated successfully", icon: "edit" });
+  const saveEdit = async (form) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`http://localhost:5000/appointments/status/${editing.id}`, 
+        { status: form.status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setAppts((prev) =>
+        prev.map((a) => {
+          if (a.id !== editing.id) return a;
+          return { ...a, status: form.status };
+        }),
+      );
+      setEditing(null);
+      setToast({ msg: "Statusul programării a fost actualizat", icon: "edit" });
+    } catch (err) {
+      console.error(err);
+      setToast({ msg: "Eroare la actualizare", icon: "del" });
+    }
   };
 
-  const doDelete = () => {
-    if (Array.isArray(delTarget)) {
-      const ids = new Set(delTarget.map((id) => id));
-      setAppts((prev) => prev.filter((a) => !ids.has(a.id)));
-      setSelected(new Set());
-      setToast({
-        msg: `${delTarget.length} appointment${delTarget.length > 1 ? "s" : ""} deleted`,
-        icon: "del",
-      });
-    } else {
-      setAppts((prev) => prev.filter((a) => a.id !== delTarget.id));
-      setEditing(null);
-      setToast({ msg: "Appointment deleted", icon: "del" });
+  const doDelete = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      if (Array.isArray(delTarget)) {
+        for (const id of delTarget) {
+          await axios.delete(`http://localhost:5000/appointments/admin/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        }
+        const ids = new Set(delTarget);
+        setAppts((prev) => prev.filter((a) => !ids.has(a.id)));
+        setSelected(new Set());
+        setToast({
+          msg: `${delTarget.length} programări șterse`,
+          icon: "del",
+        });
+      } else {
+        await axios.delete(`http://localhost:5000/appointments/admin/${delTarget.id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setAppts((prev) => prev.filter((a) => a.id !== delTarget.id));
+        setEditing(null);
+        setToast({ msg: "Programare ștearsă", icon: "del" });
+      }
+    } catch (err) {
+      console.error(err);
+      setToast({ msg: "Eroare la ștergere", icon: "del" });
     }
     setDelTarget(null);
   };
 
-  const bulkStatus = (status) => {
-    setAppts((prev) =>
-      prev.map((a) => (selected.has(a.id) ? { ...a, status } : a)),
-    );
-    setToast({
-      msg: `${selected.size} appointment${selected.size > 1 ? "s" : ""} marked as ${status}`,
-      icon: "edit",
-    });
-    setSelected(new Set());
+  const bulkStatus = async (status) => {
+    const token = localStorage.getItem("token");
+    try {
+      for (const id of selected) {
+        await axios.put(`http://localhost:5000/appointments/status/${id}`, 
+          { status },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+      setAppts((prev) =>
+        prev.map((a) => (selected.has(a.id) ? { ...a, status } : a)),
+      );
+      setToast({
+        msg: `${selected.size} programări marcate ca ${status}`,
+        icon: "edit",
+      });
+      setSelected(new Set());
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
     <div className="ad-shell">
       <aside className="ad-sidebar">
-        <a href="/" className="ad-sidebar-logo">
+        <div className="ad-sidebar-logo">
           <div className="ad-logo-mark">V</div>
           <span className="ad-logo-text">
             Vita<span>Med</span>
           </span>
-        </a>
+        </div>
         <nav className="ad-nav">
-          <div className="ad-nav-lbl">Menu</div>
+          <div className="ad-nav-lbl">Meniu</div>
           {NAV_ITEMS.map((item) => (
             <button
               key={item.label}
-              className={`ad-nav-item ${item.active ? "active" : ""}`}
+              className={`ad-nav-item ${activeTab === item.label ? "active" : ""}`}
+              onClick={() => {
+                if (item.label === "Dashboard" || item.label === "Programări") {
+                  setActiveTab(item.label);
+                }
+              }}
             >
               <span className="ad-nav-icon">{item.icon}</span>
               {item.label}
               {item.badge && <span className="ad-nav-badge">{item.badge}</span>}
             </button>
           ))}
-          <div className="ad-nav-lbl">System</div>
-          <button className="ad-nav-item">
-            <span className="ad-nav-icon">🔒</span>Audit Log
-          </button>
-          <button className="ad-nav-item">
-            <span className="ad-nav-icon">🚪</span>Sign Out
+          <div className="ad-nav-lbl">Sistem</div>
+          <button className="ad-nav-item" onClick={handleLogout}>
+            <span className="ad-nav-icon">🚪</span>Ieșire Cont
           </button>
         </nav>
         <div className="ad-sidebar-user">
-          <div className="ad-user-av">SA</div>
+          <div className="ad-user-av">
+            {user.firstName?.[0]}{user.lastName?.[0]}
+          </div>
           <div>
-            <div className="ad-user-name">System Admin</div>
-            <div className="ad-user-role">Full access</div>
+            <div className="ad-user-name">{user.firstName} {user.lastName}</div>
+            <div className="ad-user-role">Administrator</div>
           </div>
           <div className="ad-user-dot" />
         </div>
@@ -754,290 +583,275 @@ export default function AdminAppointments() {
       <div className="ad-main">
         <header className="ad-topbar">
           <div className="ad-topbar-left">
-            <div className="ad-topbar-title">Appointment Management</div>
+            <div className="ad-topbar-title">{activeTab === "Dashboard" ? "Panou Control & Statistici" : "Gestiune Programări"}</div>
             <div className="ad-topbar-sub">
-              View, edit, or remove any appointment across all doctors
+              {activeTab === "Dashboard" 
+                ? "Analiza datelor, previziuni de volum și performanța platformei" 
+                : "Vizualizează, editează sau anulează orice programare din sistem"}
             </div>
           </div>
-          <div className="ad-topbar-right">
-            <div className="ad-search-wrap">
-              <span className="ad-search-icon">🔍</span>
-              <input
-                className="ad-search"
-                placeholder="Search patient, doctor, ID…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+          {activeTab === "Programări" && (
+            <div className="ad-topbar-right">
+              <div className="ad-search-wrap">
+                <span className="ad-search-icon">🔍</span>
+                <input
+                  className="ad-search"
+                  placeholder="Caută pacient, medic, ID…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              <button className="ad-btn ghost" onClick={() => setSearch("")}>
+                Resetare
+              </button>
             </div>
-            <button className="ad-btn ghost" onClick={() => setSearch("")}>
-              Reset
-            </button>
-          </div>
+          )}
         </header>
 
         <div className="ad-content">
-          <div className="ad-stats">
-            {[
-              {
-                cls: "s1",
-                icon: "📋",
-                label: "Total",
-                num: counts.all,
-                sub: "all records",
-              },
-              {
-                cls: "s2",
-                icon: "⏳",
-                label: "Pending",
-                num: counts.pending || 0,
-                sub: "awaiting action",
-              },
-              {
-                cls: "s3",
-                icon: "✅",
-                label: "Accepted",
-                num: counts.accepted || 0,
-                sub: "confirmed",
-              },
-              {
-                cls: "s4",
-                icon: "❌",
-                label: "Declined",
-                num: counts.declined || 0,
-                sub: "not confirmed",
-              },
-              {
-                cls: "s5",
-                icon: "👥",
-                label: "Patients",
-                num: [...new Set(appts.map((a) => a.patient.email))].length,
-                sub: "unique patients",
-              },
-            ].map((s) => (
-              <div key={s.label} className={`ad-stat ${s.cls}`}>
-                <div className="ad-stat-bg">{s.icon}</div>
-                <div className="ad-stat-lbl">{s.label}</div>
-                <div className="ad-stat-num">{s.num}</div>
-                <div className="ad-stat-sub">{s.sub}</div>
+          {activeTab === "Dashboard" ? (
+            <DashboardView stats={stats} predictions={predictions} />
+          ) : (
+            <>
+              <div className="ad-stats">
+                {[
+                  {
+                    cls: "s1",
+                    icon: "📋",
+                    label: "Total",
+                    num: counts.all,
+                    sub: "toate înregistrările",
+                  },
+                  // ... rest of stats items
+                ].map((s) => (
+                  <div key={s.label} className={`ad-stat ${s.cls}`}>
+                    <div className="ad-stat-bg">{s.icon}</div>
+                    <div className="ad-stat-lbl">{s.label}</div>
+                    <div className="ad-stat-num">{s.num}</div>
+                    <div className="ad-stat-sub">{s.sub}</div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          <div className="ad-toolbar">
-            {FILTERS.map((f) => (
-              <button
-                key={f}
-                className={`ad-filter ${filter === f ? "active" : ""}`}
-                onClick={() => setFilter(f)}
-              >
-                {f.charAt(0).toUpperCase() + f.slice(1)}
-                <span className="ad-filter-n">{counts[f] || 0}</span>
-              </button>
-            ))}
-            <div className="ad-toolbar-right">
-              <select
-                className="ad-sort"
-                value={`${sort.col}-${sort.dir}`}
-                onChange={(e) => {
-                  const [col, dir] = e.target.value.split("-");
-                  setSort({ col, dir });
-                }}
-              >
-                <option value="date-asc">Date: earliest</option>
-                <option value="date-desc">Date: latest</option>
-                <option value="patient-asc">Patient A–Z</option>
-                <option value="doctor-asc">Doctor A–Z</option>
-                <option value="status-asc">Status A–Z</option>
-              </select>
-            </div>
-          </div>
-
-          {selected.size > 0 && (
-            <div className="ad-bulk-bar">
-              <span className="ad-bulk-count">{selected.size} selected</span>
-              <div className="ad-bulk-divider" />
-              <button
-                className="ad-bulk-btn"
-                onClick={() => bulkStatus("accepted")}
-              >
-                ✓ Accept all
-              </button>
-              <button
-                className="ad-bulk-btn"
-                onClick={() => bulkStatus("declined")}
-              >
-                ✕ Decline all
-              </button>
-              <button
-                className="ad-bulk-btn red"
-                onClick={() => setDelTarget([...selected])}
-              >
-                🗑 Delete all
-              </button>
-              <span
-                className="ad-bulk-clear"
-                onClick={() => setSelected(new Set())}
-              >
-                ✕ Clear
-              </span>
-            </div>
-          )}
-
-          <div className="ad-table-wrap">
-            <div className="ad-table-head">
-              <div className="ad-th">
-                <input
-                  type="checkbox"
-                  className="ad-cb"
-                  checked={allPageSelected}
-                  onChange={toggleAll}
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </div>
-              {[
-                { col: "patient", label: "Patient" },
-                { col: "doctor", label: "Doctor" },
-                { col: "date", label: "Date & Time" },
-                { col: "type", label: "Type" },
-                { col: "status", label: "Status" },
-              ].map((h) => (
-                <div
-                  key={h.col}
-                  className={`ad-th ${sort.col === h.col ? "sorted" : ""}`}
-                  onClick={() => toggleSort(h.col)}
-                >
-                  {h.label}
-                  <SortIcon col={h.col} sort={sort} />
-                </div>
-              ))}
-              <div className="ad-th" style={{ justifyContent: "flex-end" }}>
-                Actions
-              </div>
-            </div>
-
-            {pageSlice.length === 0 ? (
-              <div className="ad-empty">
-                <div className="ad-empty-icon">📭</div>
-                <div className="ad-empty-title">No appointments found</div>
-                <div className="ad-empty-sub">
-                  Try adjusting your search or filters.
+              <div className="ad-toolbar">
+                {FILTERS.map((f) => (
+                  <button
+                    key={f}
+                    className={`ad-filter ${filter === f ? "active" : ""}`}
+                    onClick={() => setFilter(f)}
+                  >
+                    {f === "all" ? "Toate" : f}
+                    <span className="ad-filter-n">{counts[f] || 0}</span>
+                  </button>
+                ))}
+                <div className="ad-toolbar-right">
+                  <select
+                    className="ad-sort"
+                    value={`${sort.col}-${sort.dir}`}
+                    onChange={(e) => {
+                      const [col, dir] = e.target.value.split("-");
+                      setSort({ col, dir });
+                    }}
+                  >
+                    <option value="date-desc">Data: Cele mai noi</option>
+                    <option value="date-asc">Data: Cele mai vechi</option>
+                    <option value="patient-asc">Pacient A–Z</option>
+                    <option value="doctor-asc">Medic A–Z</option>
+                    <option value="status-asc">Status A–Z</option>
+                  </select>
                 </div>
               </div>
-            ) : (
-              pageSlice.map((a, i) => (
-                <div
-                  key={a.id}
-                  className={`ad-row ${selected.has(a.id) ? "selected" : ""}`}
-                  style={{ animationDelay: `${i * 0.04}s` }}
-                  onClick={() => setEditing(a)}
-                >
-                  <div className="ad-cell" onClick={(e) => e.stopPropagation()}>
+
+              {selected.size > 0 && (
+                <div className="ad-bulk-bar">
+                  <span className="ad-bulk-count">{selected.size} selectate</span>
+                  <div className="ad-bulk-divider" />
+                  <button
+                    className="ad-bulk-btn"
+                    onClick={() => bulkStatus("Finalizată")}
+                  >
+                    ✓ Finalizează toate
+                  </button>
+                  <button
+                    className="ad-bulk-btn"
+                    onClick={() => bulkStatus("Anulată")}
+                  >
+                    ✕ Anulează toate
+                  </button>
+                  <button
+                    className="ad-bulk-btn red"
+                    onClick={() => setDelTarget([...selected])}
+                  >
+                    🗑 Șterge toate
+                  </button>
+                  <span
+                    className="ad-bulk-clear"
+                    onClick={() => setSelected(new Set())}
+                  >
+                    ✕ Anulează selecția
+                  </span>
+                </div>
+              )}
+
+              <div className="ad-table-wrap">
+                <div className="ad-table-head">
+                  <div className="ad-th">
                     <input
                       type="checkbox"
                       className="ad-cb"
-                      checked={selected.has(a.id)}
-                      onChange={() => toggleOne(a.id)}
+                      checked={allPageSelected}
+                      onChange={toggleAll}
+                      onClick={(e) => e.stopPropagation()}
                     />
                   </div>
+                  {[
+                    { col: "patient", label: "Pacient" },
+                    { col: "doctor", label: "Medic" },
+                    { col: "date", label: "Data & Ora" },
+                    { col: "type", label: "Tip" },
+                    { col: "status", label: "Status" },
+                  ].map((h) => (
+                    <div
+                      key={h.col}
+                      className={`ad-th ${sort.col === h.col ? "sorted" : ""}`}
+                      onClick={() => toggleSort(h.col)}
+                    >
+                      {h.label}
+                      <SortIcon col={h.col} sort={sort} />
+                    </div>
+                  ))}
+                  <div className="ad-th" style={{ justifyContent: "flex-end" }}>
+                    Acțiuni
+                  </div>
+                </div>
 
-                  <div className="ad-cell">
-                    <div className="ad-pat">
-                      <div
-                        className="ad-pat-av"
-                        style={{ background: a.patient.color }}
-                      >
-                        {a.patient.initials}
-                      </div>
-                      <div>
-                        <div className="ad-pat-name">{a.patient.name}</div>
-                        <div className="ad-pat-email">{a.patient.email}</div>
-                      </div>
+                {loading ? (
+                  <div className="ad-empty">Se încarcă datele...</div>
+                ) : pageSlice.length === 0 ? (
+                  <div className="ad-empty">
+                    <div className="ad-empty-icon">📭</div>
+                    <div className="ad-empty-title">Nu am găsit programări</div>
+                    <div className="ad-empty-sub">
+                      Încercați să ajustați căutarea sau filtrele.
                     </div>
                   </div>
+                ) : (
+                  pageSlice.map((a, i) => (
+                    <div
+                      key={a.id}
+                      className={`ad-row ${selected.has(a.id) ? "selected" : ""} ${a.status === 'Anulată' ? 'cancelled' : ''}`}
+                      style={{ animationDelay: `${i * 0.04}s` }}
+                      onClick={() => setEditing(a)}
+                    >
+                      <div className="ad-cell" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          className="ad-cb"
+                          checked={selected.has(a.id)}
+                          onChange={() => toggleOne(a.id)}
+                        />
+                      </div>
 
-                  <div className="ad-cell">
-                    <div className="ad-doc-name">{a.doctor.name}</div>
-                    <div className="ad-doc-spec">{a.doctor.spec}</div>
-                  </div>
+                      <div className="ad-cell">
+                        <div className="ad-pat">
+                          <div
+                            className="ad-pat-av"
+                            style={{ background: a.patient.color }}
+                          >
+                            {a.patient.initials}
+                          </div>
+                          <div>
+                            <div className="ad-pat-name">{a.patient.name}</div>
+                            <div className="ad-pat-email">{a.patient.email}</div>
+                          </div>
+                        </div>
+                      </div>
 
-                  <div className="ad-cell">
-                    <div className="ad-date-val">{fmtDate(a.date)}</div>
-                    <div className="ad-date-time">
-                      {a.time} · {a.duration}
+                      <div className="ad-cell">
+                        <div className="ad-doc-name">{a.doctor.name}</div>
+                        <div className="ad-doc-spec">{a.doctor.spec}</div>
+                      </div>
+
+                      <div className="ad-cell">
+                        <div className="ad-date-val">{fmtDate(a.date)}</div>
+                        <div className="ad-date-time">
+                          {a.time}
+                        </div>
+                      </div>
+
+                      <div className="ad-cell">
+                        <span className="ad-type">{a.type}</span>
+                      </div>
+
+                      <div className="ad-cell">
+                        <span className={`ad-badge ${a.status === 'Programată' ? 'pending' : a.status === 'Finalizată' ? 'accepted' : 'declined'}`}>
+                          <span className="ad-dot" />
+                          {a.status}
+                        </span>
+                      </div>
+
+                      <div className="ad-cell" onClick={(e) => e.stopPropagation()}>
+                        <div className="ad-row-acts">
+                          <button
+                            className="ad-ra"
+                            title="Editare"
+                            onClick={() => setEditing(a)}
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            className="ad-ra del"
+                            title="Ștergere"
+                            onClick={() => setDelTarget(a)}
+                          >
+                            🗑
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))
+                )}
 
-                  <div className="ad-cell">
-                    <span className="ad-type">{a.type}</span>
-                  </div>
-
-                  <div className="ad-cell">
-                    <span className={`ad-badge ${a.status}`}>
-                      <span className="ad-dot" />
-                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                {processed.length > 0 && (
+                  <div className="ad-pagination">
+                    <span className="ad-page-info">
+                      Afișare{" "}
+                      {Math.min((page - 1) * PAGE_SIZE + 1, processed.length)}–
+                      {Math.min(page * PAGE_SIZE, processed.length)} din{" "}
+                      {processed.length} programări
                     </span>
-                  </div>
-
-                  <div className="ad-cell" onClick={(e) => e.stopPropagation()}>
-                    <div className="ad-row-acts">
+                    <div className="ad-page-btns">
                       <button
-                        className="ad-ra"
-                        title="Edit"
-                        onClick={() => setEditing(a)}
+                        className="ad-page-btn"
+                        disabled={page === 1}
+                        onClick={() => setPage((p) => p - 1)}
                       >
-                        ✏️
+                        ‹
                       </button>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (n) => (
+                          <button
+                            key={n}
+                            className={`ad-page-btn ${page === n ? "active" : ""}`}
+                            onClick={() => setPage(n)}
+                          >
+                            {n}
+                          </button>
+                        ),
+                      )}
                       <button
-                        className="ad-ra del"
-                        title="Delete"
-                        onClick={() => setDelTarget(a)}
+                        className="ad-page-btn"
+                        disabled={page === totalPages}
+                        onClick={() => setPage((p) => p + 1)}
                       >
-                        🗑
+                        ›
                       </button>
                     </div>
                   </div>
-                </div>
-              ))
-            )}
-
-            {processed.length > 0 && (
-              <div className="ad-pagination">
-                <span className="ad-page-info">
-                  Showing{" "}
-                  {Math.min((page - 1) * PAGE_SIZE + 1, processed.length)}–
-                  {Math.min(page * PAGE_SIZE, processed.length)} of{" "}
-                  {processed.length} appointments
-                </span>
-                <div className="ad-page-btns">
-                  <button
-                    className="ad-page-btn"
-                    disabled={page === 1}
-                    onClick={() => setPage((p) => p - 1)}
-                  >
-                    ‹
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (n) => (
-                      <button
-                        key={n}
-                        className={`ad-page-btn ${page === n ? "active" : ""}`}
-                        onClick={() => setPage(n)}
-                      >
-                        {n}
-                      </button>
-                    ),
-                  )}
-                  <button
-                    className="ad-page-btn"
-                    disabled={page === totalPages}
-                    onClick={() => setPage((p) => p + 1)}
-                  >
-                    ›
-                  </button>
-                </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          )}
         </div>
       </div>
 

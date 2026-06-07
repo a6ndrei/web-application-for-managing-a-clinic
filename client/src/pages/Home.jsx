@@ -137,6 +137,8 @@ export default function Home() {
           <li>
             {token && user.rol === "medic" ? (
               <Link to="/doctor-appointments">Afișează programările</Link>
+            ) : token && user.rol === "admin" ? (
+              <Link to="/admin">Panou Administrare</Link>
             ) : (
               <Link to="/my-appointments">Afișează programările</Link>
             )}
@@ -144,6 +146,11 @@ export default function Home() {
           {token && user.rol === "medic" && (
             <li>
               <Link to="/manageAppointments">Gestionează toate programările</Link>
+            </li>
+          )}
+          {token && user.rol === "admin" && (
+            <li>
+              <Link to="/admin">Gestionează Sistemul</Link>
             </li>
           )}
           <li>

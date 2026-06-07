@@ -75,7 +75,13 @@ export default function Login() {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("user", JSON.stringify(res.data.user));
         setSuccess(true);
-        setTimeout(() => navigate("/"), 1500);
+        setTimeout(() => {
+          if (res.data.user.rol === "admin") {
+            navigate("/admin");
+          } else {
+            navigate("/");
+          }
+        }, 1500);
       } else {
         await axios.post("http://localhost:5000/auth/register", {
           firstName: regForm.firstName,

@@ -8,6 +8,7 @@ import Pacient from "./models/Pacient.js";
 import authRoutes from "./Routes/authRoutes.js";
 import doctorsRoutes from "./Routes/doctorsRoutes.js";
 import appointmentsRoutes from "./Routes/appointmentsRoutes.js";
+import adminStatsRoutes from "./Routes/adminStatsRoutes.js";
 
 Users.hasOne(Medic, { foreignKey: "id_user" });
 Medic.belongsTo(Users, { foreignKey: "id_user" });
@@ -30,6 +31,7 @@ app.use(express.json());
 app.use("/auth", authRoutes);
 app.use("/doctors", doctorsRoutes);
 app.use("/appointments", appointmentsRoutes);
+app.use("/stats", adminStatsRoutes);
 
 async function startServer() {
   try {

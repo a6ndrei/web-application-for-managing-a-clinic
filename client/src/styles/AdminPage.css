@@ -383,6 +383,38 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); m
 .ad-toast-icon.del { color:#FF6B6B; }
 .ad-toast-icon.edit{ color:var(--gold); }
 
+/* Dashboard Styles */
+.ad-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  animation: fadeUp .4s ease both;
+}
+
+.ad-dash-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.ad-dash-card.full {
+  grid-column: span 2;
+}
+
+.ad-dash-card-title {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+
+.ad-dash-card-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
 
 @keyframes fadeUp  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 @keyframes fadeIn  { from{opacity:0} to{opacity:1} }

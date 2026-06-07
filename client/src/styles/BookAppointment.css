@@ -183,6 +183,9 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); m
 .bk-slot:hover:not(.unavailable) { border-color: var(--gold-lt); }
 .bk-slot.selected { background: var(--navy); color: var(--white); border-color: var(--navy); }
 .bk-slot.unavailable { color: rgba(11,30,61,0.2); cursor: not-allowed; background: var(--cream); border-color: transparent; }
+.bk-slot.recom { border-color: var(--gold); background: rgba(198,168,107,0.08); position: relative; }
+.bk-recom-icon { font-size: 10px; margin-right: 4px; }
+.bk-recom-hint { font-size: 11px; color: var(--muted); margin-top: 12px; font-style: italic; display: flex; align-items: flex-start; gap: 6px; }
 
 
 .bk-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

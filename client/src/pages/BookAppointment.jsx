@@ -113,6 +113,7 @@ export default function BookAppointment() {
   const [submitted, setSubmitted] = useState(false);
   const [doctors, setDoctors] = useState([]);
   const [busySlots, setBusySlots] = useState([]);
+  const [recommendedSlots, setRecommendedSlots] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -133,6 +134,9 @@ export default function BookAppointment() {
     if (booking.doctor && booking.date) {
       axios.get(`http://localhost:5000/appointments/busy-slots?id_medic=${booking.doctor.id}&date=${booking.date}`)
         .then(res => setBusySlots(res.data));
+      
+      axios.get(`http://localhost:5000/appointments/recommend-slots?id_medic=${booking.doctor.id}&date=${booking.date}`)
+        .then(res => setRecommendedSlots(res.data));
     }
   }, [booking.doctor, booking.date]);
 
@@ -246,16 +250,23 @@ export default function BookAppointment() {
               </div>
               <Calendar selected={booking.date} onSelect={d => { set("date", d); set("time", ""); }} />
               {booking.date && (
-                <div className="bk-slots-grid" style={{ marginTop: 20 }}>
-                  {TIMES.map(t => {
-                    const isBusy = busySlots.includes(t);
-                    return (
-                      <div key={t} className={`bk-slot ${isBusy ? "unavailable" : ""} ${booking.time === t ? "selected" : ""}`} onClick={() => !isBusy && set("time", t)}>
-                        {t}
-                      </div>
-                    );
-                  })}
-                </div>
+                <>
+                  <div className="bk-slots-grid" style={{ marginTop: 20 }}>
+                    {TIMES.map(t => {
+                      const isBusy = busySlots.includes(t);
+                      const isRecommended = recommendedSlots.includes(t);
+                      return (
+                        <div key={t} className={`bk-slot ${isBusy ? "unavailable" : ""} ${isRecommended ? "recom" : ""} ${booking.time === t ? "selected" : ""}`} onClick={() => !isBusy && set("time", t)}>
+                          {isRecommended && <span className="bk-recom-icon">⭐</span>}
+                          {t}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {recommendedSlots.length > 0 && (
+                    <p className="bk-recom-hint">Orele marcate cu ⭐ sunt recomandate pentru o programare mai rapidă și echilibrarea încărcării medicului.</p>
+                  )}
+                </>
               )}
               <div className="bk-nav-btns">
                 <button className="bk-btn-back" onClick={() => setStep(1)}>← Înapoi</button>
