@@ -1,172 +1,20 @@
 import { useState, useMemo, useEffect } from "react";
+import axios from "axios";
 import "../styles/ManageAppointments.css";
 
-const INITIAL = [
-  {
-    id: "A-3301",
-    patient: {
-      name: "Margaret Liu",
-      email: "m.liu@email.com",
-      initials: "ML",
-      color: "#D9C49A",
-    },
-    doctor: { name: "Dr. Elena Marchetti", spec: "Cardiology" },
-    date: "2026-05-18",
-    time: "10:00 AM",
-    type: "Consultation",
-    status: "pending",
-    note: "Intermittent chest tightness. EKG review requested.",
-  },
-  {
-    id: "A-3302",
-    patient: {
-      name: "Thomas Bauer",
-      email: "t.bauer@email.com",
-      initials: "TB",
-      color: "#A8C4D9",
-    },
-    doctor: { name: "Dr. James Okafor", spec: "Neurology" },
-    date: "2026-05-18",
-    time: "11:30 AM",
-    type: "Follow-up",
-    status: "pending",
-    note: "Post-MRI follow-up. Discuss findings from April scan.",
-  },
-  {
-    id: "A-3303",
-    patient: {
-      name: "Isabelle Fontaine",
-      email: "i.fontaine@email.com",
-      initials: "IF",
-      color: "#D4A8C7",
-    },
-    doctor: { name: "Dr. Sophia Reyes", spec: "Orthopedics" },
-    date: "2026-05-19",
-    time: "2:00 PM",
-    type: "Consultation",
-    status: "accepted",
-    note: "Knee replacement pre-op assessment.",
-  },
-  {
-    id: "A-3304",
-    patient: {
-      name: "David Osei",
-      email: "d.osei@email.com",
-      initials: "DO",
-      color: "#A8D4B8",
-    },
-    doctor: { name: "Dr. Alan Voss", spec: "Internal Medicine" },
-    date: "2026-05-19",
-    time: "9:00 AM",
-    type: "Annual Check-up",
-    status: "accepted",
-    note: "Routine annual exam. Blood panel ordered.",
-  },
-  {
-    id: "A-3305",
-    patient: {
-      name: "Priya Nair",
-      email: "p.nair@email.com",
-      initials: "PN",
-      color: "#F0C8A0",
-    },
-    doctor: { name: "Dr. Elena Marchetti", spec: "Cardiology" },
-    date: "2026-05-20",
-    time: "3:30 PM",
-    type: "Consultation",
-    status: "declined",
-    note: "Rescheduling requested for week of May 25.",
-  },
-  {
-    id: "A-3306",
-    patient: {
-      name: "Carlos Mendez",
-      email: "c.mendez@email.com",
-      initials: "CM",
-      color: "#C8B4E8",
-    },
-    doctor: { name: "Dr. James Okafor", spec: "Neurology" },
-    date: "2026-05-20",
-    time: "10:30 AM",
-    type: "Follow-up",
-    status: "pending",
-    note: "Awaiting insurance pre-authorisation confirmation.",
-  },
-  {
-    id: "A-3307",
-    patient: {
-      name: "Saoirse Kelly",
-      email: "s.kelly@email.com",
-      initials: "SK",
-      color: "#F0D4A8",
-    },
-    doctor: { name: "Dr. Sophia Reyes", spec: "Orthopedics" },
-    date: "2026-05-21",
-    time: "1:00 PM",
-    type: "Consultation",
-    status: "pending",
-    note: "New patient referral. Lower back pain, possible L4-L5 disc.",
-  },
-  {
-    id: "A-3308",
-    patient: {
-      name: "Wei Zhang",
-      email: "w.zhang@email.com",
-      initials: "WZ",
-      color: "#A8D4D0",
-    },
-    doctor: { name: "Dr. Alan Voss", spec: "Internal Medicine" },
-    date: "2026-05-22",
-    time: "8:00 AM",
-    type: "Lab Review",
-    status: "accepted",
-    note: "Review Q2 blood panel and thyroid results.",
-  },
-  {
-    id: "A-3309",
-    patient: {
-      name: "Nadia Petrov",
-      email: "n.petrov@email.com",
-      initials: "NP",
-      color: "#EAD4A8",
-    },
-    doctor: { name: "Dr. Claire Dupont", spec: "Ophthalmology" },
-    date: "2026-05-22",
-    time: "4:00 PM",
-    type: "Consultation",
-    status: "pending",
-    note: "Vision deterioration, possible early-stage glaucoma.",
-  },
-  {
-    id: "A-3310",
-    patient: {
-      name: "Luca Ferretti",
-      email: "l.ferretti@email.com",
-      initials: "LF",
-      color: "#C8D4E8",
-    },
-    doctor: { name: "Dr. Nadia Petrov", spec: "Dermatology" },
-    date: "2026-05-23",
-    time: "11:00 AM",
-    type: "Consultation",
-    status: "pending",
-    note: "Persistent rash on forearms. Possible eczema or psoriasis.",
-  },
-];
-
-const FILTERS = ["all", "pending", "accepted", "declined"];
+const FILTERS = ["all", "Programată", "Finalizată", "Anulată"];
 const NAV_ITEMS = [
   { icon: "🏠", label: "Dashboard", badge: null },
-  { icon: "📋", label: "Appointments", badge: "4", active: true },
+  { icon: "📋", label: "Appointments", badge: null, active: true },
   { icon: "👥", label: "Patients", badge: null },
   { icon: "👨‍⚕️", label: "Doctors", badge: null },
-  { icon: "🧪", label: "Lab Results", badge: "2" },
+  { icon: "🧪", label: "Lab Results", badge: null },
   { icon: "📊", label: "Reports", badge: null },
   { icon: "⚙️", label: "Settings", badge: null },
 ];
 
 const fmtDate = (d) =>
-  new Date(d + "T00:00:00").toLocaleDateString("en-GB", {
+  new Date(d + "T00:00:00").toLocaleDateString("ro-RO", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -190,16 +38,16 @@ function Modal({ action, appt, onConfirm, onCancel }) {
   const configs = {
     delete: {
       icon: "🗑️",
-      title: "Delete appointment",
-      sub: `This will permanently remove the appointment for`,
-      btnLabel: "Delete",
+      title: "Anulează programarea",
+      sub: `Ești pe cale să anulezi programarea pentru`,
+      btnLabel: "Anulează",
       btnClass: "danger",
     },
     decline: {
       icon: "❌",
-      title: "Decline appointment",
-      sub: `You are about to decline the appointment for`,
-      btnLabel: "Decline",
+      title: "Refuză programarea",
+      sub: `Ești pe cale să refuzi programarea pentru`,
+      btnLabel: "Refuză",
       btnClass: "warn",
     },
   };
@@ -211,11 +59,11 @@ function Modal({ action, appt, onConfirm, onCancel }) {
         <div className="ma-modal-title">{c.title}</div>
         <p className="ma-modal-sub">
           {c.sub} <span className="ma-modal-patient">{appt.patient.name}</span>{" "}
-          on {fmtDate(appt.date)} at {appt.time}. This action cannot be undone.
+          pe data de {fmtDate(appt.date)} la {appt.time}. Această acțiune nu poate fi anulată.
         </p>
         <div className="ma-modal-btns">
           <button className="ma-modal-cancel" onClick={onCancel}>
-            Cancel
+            Renunță
           </button>
           <button
             className={`ma-modal-confirm ${c.btnClass}`}
@@ -230,13 +78,51 @@ function Modal({ action, appt, onConfirm, onCancel }) {
 }
 
 export default function ManageAppointments() {
-  const [appts, setAppts] = useState(INITIAL);
+  const [appts, setAppts] = useState([]);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("date-asc");
   const [view, setView] = useState("cards");
   const [modal, setModal] = useState(null);
   const [toast, setToast] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  const fetchAppointments = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get("http://localhost:5000/appointments/all", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const mapped = res.data.map((a) => ({
+        id: a.id,
+        patient: {
+          name: `${a.Pacient.User.firstName} ${a.Pacient.User.lastName}`,
+          email: a.Pacient.User.email,
+          initials: `${a.Pacient.User.firstName[0]}${a.Pacient.User.lastName[0]}`,
+          color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+        },
+        doctor: {
+          name: `Dr. ${a.Medic.User.firstName} ${a.Medic.User.lastName}`,
+          spec: a.specializare,
+        },
+        date: a.data_programare,
+        time: a.ora_programare,
+        type: a.tip_vizita,
+        status: a.status,
+        note: a.notes,
+      }));
+      setAppts(mapped);
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const counts = useMemo(() => {
     const c = { all: appts.length };
@@ -256,7 +142,7 @@ export default function ManageAppointments() {
           a.patient.name.toLowerCase().includes(q) ||
           a.doctor.name.toLowerCase().includes(q) ||
           a.doctor.spec.toLowerCase().includes(q) ||
-          a.id.toLowerCase().includes(q),
+          String(a.id).toLowerCase().includes(q),
       );
     }
     list.sort((a, b) => {
@@ -277,19 +163,28 @@ export default function ManageAppointments() {
   }, [appts, filter, search, sort]);
 
   const setStatus = (id, status) => {
+    // În mod normal am face un apel API aici
     setAppts((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
     const labels = {
-      accepted: "Appointment accepted",
-      declined: "Appointment declined",
+      Programată: "Programare restabilită",
+      Finalizată: "Programare finalizată",
+      Anulată: "Programare anulată",
     };
-    const types = { accepted: "success", declined: "warn" };
-    setToast({ msg: labels[status], type: types[status] });
+    setToast({ msg: labels[status], type: "success" });
   };
 
-  const doDelete = (id) => {
-    setAppts((prev) => prev.filter((a) => a.id !== id));
-    setModal(null);
-    setToast({ msg: "Appointment deleted", type: "danger" });
+  const doDelete = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:5000/appointments/cancel/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAppts((prev) => prev.filter((a) => a.id !== id));
+      setModal(null);
+      setToast({ msg: "Programare ștearsă", type: "danger" });
+    } catch (err) {
+      alert(err.response?.data?.message || "Eroare la ștergere");
+    }
   };
 
   const openModal = (action, appt) => setModal({ action, appt });
@@ -297,31 +192,26 @@ export default function ManageAppointments() {
 
   const ActionButtons = ({ appt, compact = false }) => (
     <>
-      <button
-        className={compact ? "ma-row-act accept" : "ma-act-btn ma-act-accept"}
-        disabled={appt.status === "accepted"}
-        onClick={() => setStatus(appt.id, "accepted")}
-        title="Accept"
-      >
-        ✓ {!compact && "Accept"}
-      </button>
-      <button
-        className={compact ? "ma-row-act decline" : "ma-act-btn ma-act-decline"}
-        disabled={appt.status === "declined"}
-        onClick={() => openModal("decline", appt)}
-        title="Decline"
-      >
-        ✕ {!compact && "Decline"}
-      </button>
+      {appt.status !== "Finalizată" && (
+        <button
+          className={compact ? "ma-row-act accept" : "ma-act-btn ma-act-accept"}
+          onClick={() => setStatus(appt.id, "Finalizată")}
+          title="Finalizează"
+        >
+          ✓ {!compact && "Finalizează"}
+        </button>
+      )}
       <button
         className={compact ? "ma-row-act del" : "ma-act-btn ma-act-delete"}
         onClick={() => openModal("delete", appt)}
-        title="Delete"
+        title="Șterge"
       >
-        🗑 {!compact && "Delete"}
+        🗑 {!compact && "Șterge"}
       </button>
     </>
   );
+
+  if (loading) return <div style={{ color: "white", padding: 50, textAlign: "center" }}>Se încarcă programările...</div>;
 
   return (
     <div className="ma-shell">
@@ -345,25 +235,18 @@ export default function ManageAppointments() {
             </button>
           ))}
           <div className="ma-nav-label">Account</div>
-          <button className="ma-nav-item">
+          <button className="ma-nav-item" onClick={() => { localStorage.removeItem("token"); window.location.href="/login"; }}>
             <span className="ma-nav-icon">🚪</span>Sign Out
           </button>
         </nav>
-        <div className="ma-sidebar-user">
-          <div className="ma-user-avatar">EM</div>
-          <div>
-            <div className="ma-user-name">Dr. E. Marchetti</div>
-            <div className="ma-user-role">Administrator</div>
-          </div>
-        </div>
       </aside>
 
       <div className="ma-main">
         <header className="ma-topbar">
           <div className="ma-topbar-left">
-            <span className="ma-topbar-title">Manage Appointments</span>
+            <span className="ma-topbar-title">Gestionează Programările</span>
             <span className="ma-topbar-sub">
-              Review, accept, or decline incoming bookings
+              Revizuiește, acceptă sau anulează programările pacienților
             </span>
           </div>
           <div className="ma-topbar-right">
@@ -371,7 +254,7 @@ export default function ManageAppointments() {
               <span className="ma-search-icon">🔍</span>
               <input
                 className="ma-search"
-                placeholder="Search patient, doctor…"
+                placeholder="Caută pacient, doctor…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -399,27 +282,27 @@ export default function ManageAppointments() {
           <div className="ma-summary">
             <div className="ma-sum-card c-pending">
               <div className="ma-sum-icon">⏳</div>
-              <div className="ma-sum-label">Pending Review</div>
-              <div className="ma-sum-num">{counts.pending || 0}</div>
-              <div className="ma-sum-sub">Awaiting action</div>
+              <div className="ma-sum-label">Programate</div>
+              <div className="ma-sum-num">{counts.Programată || 0}</div>
+              <div className="ma-sum-sub">În așteptare</div>
             </div>
             <div className="ma-sum-card c-accepted">
               <div className="ma-sum-icon">✅</div>
-              <div className="ma-sum-label">Accepted</div>
-              <div className="ma-sum-num">{counts.accepted || 0}</div>
-              <div className="ma-sum-sub">Confirmed bookings</div>
+              <div className="ma-sum-label">Finalizate</div>
+              <div className="ma-sum-num">{counts.Finalizată || 0}</div>
+              <div className="ma-sum-sub">Vizite încheiate</div>
             </div>
             <div className="ma-sum-card c-declined">
               <div className="ma-sum-icon">❌</div>
-              <div className="ma-sum-label">Declined</div>
-              <div className="ma-sum-num">{counts.declined || 0}</div>
-              <div className="ma-sum-sub">Not confirmed</div>
+              <div className="ma-sum-label">Anulate</div>
+              <div className="ma-sum-num">{counts.Anulată || 0}</div>
+              <div className="ma-sum-sub">Programări anulate</div>
             </div>
             <div className="ma-sum-card c-total">
               <div className="ma-sum-icon">📋</div>
               <div className="ma-sum-label">Total</div>
               <div className="ma-sum-num">{counts.all}</div>
-              <div className="ma-sum-sub">All appointments</div>
+              <div className="ma-sum-sub">Toate programările</div>
             </div>
           </div>
 
@@ -430,7 +313,7 @@ export default function ManageAppointments() {
                 className={`ma-filter-btn ${filter === f ? "active" : ""}`}
                 onClick={() => setFilter(f)}
               >
-                {f.charAt(0).toUpperCase() + f.slice(1)}
+                {f}
                 <span className="ma-filter-count">{counts[f] || 0}</span>
               </button>
             ))}
@@ -440,9 +323,9 @@ export default function ManageAppointments() {
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
               >
-                <option value="date-asc">Date: earliest first</option>
-                <option value="date-desc">Date: latest first</option>
-                <option value="patient">Patient A–Z</option>
+                <option value="date-asc">Data: cele mai apropiate</option>
+                <option value="date-desc">Data: cele mai îndepărtate</option>
+                <option value="patient">Pacient A–Z</option>
                 <option value="doctor">Doctor A–Z</option>
               </select>
             </div>
@@ -452,9 +335,9 @@ export default function ManageAppointments() {
             (filtered.length === 0 ? (
               <div className="ma-empty">
                 <div className="ma-empty-icon">📭</div>
-                <div className="ma-empty-title">No appointments found</div>
+                <div className="ma-empty-title">Nu s-au găsit programări</div>
                 <div className="ma-empty-sub">
-                  Try adjusting your search or filter.
+                  Încearcă să ajustezi căutarea sau filtrele.
                 </div>
               </div>
             ) : (
@@ -478,9 +361,9 @@ export default function ManageAppointments() {
                           <div className="ma-card-email">{a.patient.email}</div>
                         </div>
                       </div>
-                      <span className={`ma-badge ${a.status}`}>
+                      <span className={`ma-badge ${a.status === "Programată" ? "pending" : a.status === "Finalizată" ? "accepted" : "declined"}`}>
                         <span className="ma-badge-dot" />
-                        {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                        {a.status}
                       </span>
                     </div>
 
@@ -498,7 +381,7 @@ export default function ManageAppointments() {
                           {fmtDate(a.date)}
                         </span>
                         <span style={{ color: "var(--muted)" }}>
-                          at {a.time}
+                          la {a.time}
                         </span>
                       </div>
                       <div className="ma-card-row">
@@ -511,7 +394,7 @@ export default function ManageAppointments() {
                             marginLeft: "auto",
                           }}
                         >
-                          {a.id}
+                          #{a.id}
                         </span>
                       </div>
                       {a.note && (
@@ -533,22 +416,22 @@ export default function ManageAppointments() {
           {view === "table" && (
             <div className="ma-table-wrap">
               <div className="ma-table-head">
-                <div className="ma-th">Patient</div>
+                <div className="ma-th">Pacient</div>
                 <div className="ma-th">Doctor</div>
-                <div className="ma-th">Date & Time</div>
-                <div className="ma-th">Type</div>
+                <div className="ma-th">Data & Ora</div>
+                <div className="ma-th">Tip</div>
                 <div className="ma-th">Status</div>
                 <div className="ma-th" style={{ textAlign: "right" }}>
-                  Actions
+                  Acțiuni
                 </div>
               </div>
 
               {filtered.length === 0 ? (
                 <div className="ma-empty">
                   <div className="ma-empty-icon">📭</div>
-                  <div className="ma-empty-title">No appointments found</div>
+                  <div className="ma-empty-title">Nu s-au găsit programări</div>
                   <div className="ma-empty-sub">
-                    Try adjusting your search or filter.
+                    Încearcă să ajustezi căutarea sau filtrele.
                   </div>
                 </div>
               ) : (
@@ -584,9 +467,9 @@ export default function ManageAppointments() {
                       <span className="ma-type-pill">{a.type}</span>
                     </div>
                     <div className="ma-cell">
-                      <span className={`ma-badge ${a.status}`}>
+                      <span className={`ma-badge ${a.status === "Programată" ? "pending" : a.status === "Finalizată" ? "accepted" : "declined"}`}>
                         <span className="ma-badge-dot" />
-                        {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                        {a.status}
                       </span>
                     </div>
                     <div className="ma-cell" style={{ textAlign: "right" }}>
@@ -609,10 +492,6 @@ export default function ManageAppointments() {
           onCancel={closeModal}
           onConfirm={() => {
             if (modal.action === "delete") doDelete(modal.appt.id);
-            if (modal.action === "decline") {
-              setStatus(modal.appt.id, "declined");
-              closeModal();
-            }
           }}
         />
       )}

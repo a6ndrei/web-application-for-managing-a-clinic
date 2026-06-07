@@ -169,7 +169,7 @@ export default function BookAppointment() {
         <h2 className="bk-success-title">Programare <em>confirmată!</em></h2>
         <p className="bk-success-sub">Rezervarea dvs. a fost salvată în sistem.</p>
         <div className="bk-success-btns">
-          <button className="bk-success-btn-primary" onClick={() => navigate("/manageAppointments")}>Vezi programările mele</button>
+          <button className="bk-success-btn-primary" onClick={() => navigate("/my-appointments")}>Vezi programările mele</button>
           <button className="bk-success-btn-ghost" onClick={() => navigate("/")}>Acasă</button>
         </div>
       </div>

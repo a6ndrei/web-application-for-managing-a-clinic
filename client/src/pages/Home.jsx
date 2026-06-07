@@ -135,8 +135,17 @@ export default function Home() {
             <Link to="/bookAppointment">Programează-te</Link>
           </li>
           <li>
-            <Link to="/manageAppointments">Afișează programările</Link>
+            {token && user.rol === "medic" ? (
+              <Link to="/doctor-appointments">Afișează programările</Link>
+            ) : (
+              <Link to="/my-appointments">Afișează programările</Link>
+            )}
           </li>
+          {token && user.rol === "medic" && (
+            <li>
+              <Link to="/manageAppointments">Gestionează toate programările</Link>
+            </li>
+          )}
           <li>
             {token ? (
               <button onClick={handleLogout} className="nav-btn-link">Sign Out</button>

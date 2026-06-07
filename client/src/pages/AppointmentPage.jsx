@@ -1,108 +1,18 @@
 import { useState, useMemo, useEffect } from "react";
-import "../styles/PatientAppointments.css";
+import "../styles/AppointmentPage.css";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const PATIENT = {
-  name: "Margaret Liu",
-  initials: "ML",
-  email: "m.liu@email.com",
-};
-
-const SEED = [
-  {
-    id: "APT-3301",
-    type: "Cardiology Consultation",
-    specialty: "Cardiology",
-    doctor: "Dr. Elena Marchetti",
-    date: "2026-05-19",
-    time: "10:00 AM",
-    duration: "45 min",
-    room: "Suite 3B",
-    status: "upcoming",
-    note: "Bring all previous ECG reports and the St. Mary's referral letter.",
-  },
-  {
-    id: "APT-3302",
-    type: "Neurology Follow-up",
-    specialty: "Neurology",
-    doctor: "Dr. James Okafor",
-    date: "2026-05-26",
-    time: "11:30 AM",
-    duration: "30 min",
-    room: "Suite 1A",
-    status: "upcoming",
-    note: "Post-MRI review. Bring the April scan CD if available.",
-  },
-  {
-    id: "APT-3303",
-    type: "Annual Check-up",
-    specialty: "Internal Medicine",
-    doctor: "Dr. Alan Voss",
-    date: "2026-05-13",
-    time: "9:00 AM",
-    duration: "45 min",
-    room: "Suite 2D",
-    status: "completed",
-    note: "Blood panel ordered. Results available in the portal.",
-  },
-  {
-    id: "APT-3304",
-    type: "Dermatology Consultation",
-    specialty: "Dermatology",
-    doctor: "Dr. Nadia Petrov",
-    date: "2026-05-10",
-    time: "2:30 PM",
-    duration: "30 min",
-    room: "Suite 4B",
-    status: "completed",
-    note: "Patch test results discussed. Follow-up cream prescribed.",
-  },
-  {
-    id: "APT-3305",
-    type: "Ophthalmology Screening",
-    specialty: "Ophthalmology",
-    doctor: "Dr. Claire Dupont",
-    date: "2026-04-28",
-    time: "3:00 PM",
-    duration: "45 min",
-    room: "Suite 6A",
-    status: "completed",
-    note: "Vision stable. New prescription issued. Annual review booked.",
-  },
-  {
-    id: "APT-3306",
-    type: "Orthopedics Consultation",
-    specialty: "Orthopedics",
-    doctor: "Dr. Sophia Reyes",
-    date: "2026-05-07",
-    time: "1:00 PM",
-    duration: "60 min",
-    room: "Suite 5C",
-    status: "cancelled",
-    note: "Cancelled due to scheduling conflict. Please rebook.",
-  },
-  {
-    id: "APT-3307",
-    type: "Cardiology Results Review",
-    specialty: "Cardiology",
-    doctor: "Dr. Elena Marchetti",
-    date: "2026-06-03",
-    time: "8:30 AM",
-    duration: "20 min",
-    room: "Suite 3B",
-    status: "upcoming",
-    note: "Stress test results review and treatment plan discussion.",
-  },
-];
 
 const FILTERS = [
-  { key: "all", label: "All", dot: null },
-  { key: "upcoming", label: "Upcoming", dot: "#C6A86B" },
-  { key: "completed", label: "Completed", dot: "#27AE60" },
-  { key: "cancelled", label: "Cancelled", dot: "#C0392B" },
+  { key: "all", label: "Toate", dot: null },
+  { key: "Programată", label: "Programate", dot: "#C6A86B" },
+  { key: "Finalizată", label: "Finalizate", dot: "#27AE60" },
+  { key: "Anulată", label: "Anulate", dot: "#C0392B" },
 ];
 
 const fmtDate = (d) =>
-  new Date(d + "T00:00:00").toLocaleDateString("en-GB", {
+  new Date(d + "T00:00:00").toLocaleDateString("ro-RO", {
     weekday: "short",
     day: "numeric",
     month: "short",
@@ -110,21 +20,19 @@ const fmtDate = (d) =>
   });
 
 const fmtDay = (d) =>
-  new Date(d + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric" });
+  new Date(d + "T00:00:00").toLocaleDateString("ro-RO", { day: "numeric" });
 
 const fmtMonth = (d) =>
   new Date(d + "T00:00:00")
-    .toLocaleDateString("en-GB", { month: "short" })
+    .toLocaleDateString("ro-RO", { month: "short" })
     .toUpperCase();
 
 const specialtyIcon = (s) =>
   ({
-    Cardiology: "🫀",
-    Neurology: "🧠",
-    Orthopedics: "🦴",
-    "Internal Medicine": "🩺",
-    Ophthalmology: "👁️",
-    Dermatology: "🌿",
+    Cardiologie: "🫀",
+    Neurologie: "🧠",
+    Oftalmologie: "👁️",
+    Dermatologie: "🌿",
   })[s] || "🏥";
 
 function Toast({ msg, onDone }) {
@@ -141,29 +49,30 @@ function DeleteModal({ appt, onConfirm, onCancel }) {
       <div className="pt-modal" onClick={(e) => e.stopPropagation()}>
         <div className="pt-modal-top">
           <div className="pt-modal-icon-wrap">🗑️</div>
-          <div className="pt-modal-title">Cancel appointment?</div>
+          <div className="pt-modal-title">Anulezi programarea?</div>
         </div>
         <p className="pt-modal-sub">
-          This will permanently remove this booking from your records. You can
-          always rebook through the portal.
+          Această acțiune va elimina definitiv programarea. Poți oricând să faci
+          o programare nouă din portal.
         </p>
         <div className="pt-modal-appt-card">
           <div className="pt-modal-appt-icon">
-            {specialtyIcon(appt.specialty)}
+            {specialtyIcon(appt.specializare)}
           </div>
           <div>
-            <div className="pt-modal-appt-type">{appt.type}</div>
+            <div className="pt-modal-appt-type">{appt.specializare}</div>
             <div className="pt-modal-appt-meta">
-              {appt.doctor} · {fmtDate(appt.date)} at {appt.time}
+              Dr. {appt.Medic.User.firstName} {appt.Medic.User.lastName} ·{" "}
+              {fmtDate(appt.data_programare)} la {appt.ora_programare}
             </div>
           </div>
         </div>
         <div className="pt-modal-btns">
           <button className="pt-modal-cancel" onClick={onCancel}>
-            Keep it
+            Păstrează
           </button>
           <button className="pt-modal-confirm" onClick={onConfirm}>
-            Yes, delete
+            Da, anulează
           </button>
         </div>
       </div>
@@ -171,13 +80,40 @@ function DeleteModal({ appt, onConfirm, onCancel }) {
   );
 }
 
-export default function PatientAppointments() {
-  const [appts, setAppts] = useState(SEED);
+export default function AppointmentPage() {
+  const [appts, setAppts] = useState([]);
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("date-asc");
-  const [view, setView] = useState("cards"); 
+  const [view, setView] = useState("cards");
   const [modal, setModal] = useState(null);
   const [toast, setToast] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  const fetchAppointments = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        "http://localhost:5000/appointments/my-appointments",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      console.log("Fetched appts:", res.data);
+      setAppts(res.data);
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const counts = useMemo(() => {
     const c = { all: appts.length };
@@ -191,12 +127,10 @@ export default function PatientAppointments() {
     let list = [...appts];
     if (filter !== "all") list = list.filter((a) => a.status === filter);
     list.sort((a, b) => {
-      const da = new Date(a.date + " " + a.time);
-      const db = new Date(b.date + " " + b.time);
+      const da = new Date(a.data_programare + " " + a.ora_programare);
+      const db = new Date(b.data_programare + " " + b.ora_programare);
       if (sort === "date-asc") return da - db;
       if (sort === "date-desc") return db - da;
-      if (sort === "type") return a.type.localeCompare(b.type);
-      if (sort === "doctor") return a.doctor.localeCompare(b.doctor);
       return 0;
     });
     return list;
@@ -205,16 +139,36 @@ export default function PatientAppointments() {
   const nextAppt = useMemo(
     () =>
       [...appts]
-        .filter((a) => a.status === "upcoming")
-        .sort((a, b) => new Date(a.date) - new Date(b.date))[0],
+        .filter((a) => a.status === "Programată")
+        .sort(
+          (a, b) => new Date(a.data_programare) - new Date(b.data_programare),
+        )[0],
     [appts],
   );
 
-  const doDelete = () => {
-    setAppts((prev) => prev.filter((a) => a.id !== modal.id));
-    setToast({ msg: `${modal.type} removed from your appointments.` });
-    setModal(null);
+  const doDelete = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(
+        `http://localhost:5000/appointments/cancel/${modal.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      setToast({ msg: `Programarea la ${modal.specializare} a fost anulată.` });
+      setAppts((prev) => prev.filter((a) => a.id !== modal.id));
+      setModal(null);
+    } catch (err) {
+      alert(err.response?.data?.message || "Eroare la anularea programării.");
+    }
   };
+
+  if (loading)
+    return (
+      <div style={{ color: "white", padding: 50, textAlign: "center" }}>
+        Se încarcă programările...
+      </div>
+    );
 
   return (
     <>
@@ -227,26 +181,33 @@ export default function PatientAppointments() {
         </a>
         <ul className="pt-nav-links">
           <li>
-            <a href="#">Dashboard</a>
+            <a href="/">Acasă</a>
           </li>
           <li>
             <a href="#" className="active">
-              Appointments
+              Programări
             </a>
           </li>
           <li>
-            <a href="#">Lab Results</a>
+            <a href="#">Rezultate Analize</a>
           </li>
           <li>
-            <a href="#">Messages</a>
+            <a href="#">Mesaje</a>
           </li>
           <li>
-            <a href="#">Profile</a>
+            <a href="#">Profil</a>
           </li>
         </ul>
-        <div className="pt-nav-user">
-          <div className="pt-nav-avatar">{PATIENT.initials}</div>
-          <span className="pt-nav-name">{PATIENT.name.split(" ")[0]}</span>
+        <div
+          className="pt-nav-user"
+          onClick={() => navigate("/login")}
+          style={{ cursor: "pointer" }}
+        >
+          <div className="pt-nav-avatar">
+            {user.firstName?.[0]}
+            {user.lastName?.[0]}
+          </div>
+          <span className="pt-nav-name">{user.firstName}</span>
         </div>
       </nav>
 
@@ -255,26 +216,26 @@ export default function PatientAppointments() {
         <div className="pt-hero-grain" />
         <div className="pt-hero-inner">
           <div className="pt-hero-left">
-            <p className="pt-hero-tag">Patient Portal</p>
+            <p className="pt-hero-tag">Portal Pacient</p>
             <h1 className="pt-hero-title">
-              My Appointments,
-              <em>{PATIENT.name}.</em>
+              Programările mele,
+              <em> {user.firstName}.</em>
             </h1>
             <p className="pt-hero-sub">
-              Your full appointment history across all specialties. Book new
-              slots, track upcoming visits, and manage your care schedule.
+              Istoricul complet al vizitelor tale medicale. Gestionează
+              programările viitoare și urmărește starea sănătății tale.
             </p>
           </div>
           <div className="pt-hero-pills">
             <div
-              className={`pt-hero-pill ${counts.upcoming ? "highlight" : ""}`}
+              className={`pt-hero-pill ${counts.Programată ? "highlight" : ""}`}
             >
-              <div className="pt-pill-num">{counts.upcoming || 0}</div>
-              <div className="pt-pill-lbl">Upcoming</div>
+              <div className="pt-pill-num">{counts.Programată || 0}</div>
+              <div className="pt-pill-lbl">Viitoare</div>
             </div>
             <div className="pt-hero-pill">
-              <div className="pt-pill-num">{counts.completed || 0}</div>
-              <div className="pt-pill-lbl">Completed</div>
+              <div className="pt-pill-num">{counts.Finalizată || 0}</div>
+              <div className="pt-pill-lbl">Finalizate</div>
             </div>
             <div className="pt-hero-pill">
               <div className="pt-pill-num">{counts.all}</div>
@@ -288,17 +249,23 @@ export default function PatientAppointments() {
         {nextAppt && (
           <div className="pt-next-banner">
             <div className="pt-next-icon">
-              {specialtyIcon(nextAppt.specialty)}
+              {specialtyIcon(nextAppt.specializare)}
             </div>
             <div className="pt-next-body">
-              <div className="pt-next-label">Your next appointment</div>
-              <div className="pt-next-title">{nextAppt.type}</div>
+              <div className="pt-next-label">Următoarea ta programare</div>
+              <div className="pt-next-title">{nextAppt.specializare}</div>
               <div className="pt-next-meta">
-                {nextAppt.doctor} &nbsp;·&nbsp; {fmtDate(nextAppt.date)} at{" "}
-                {nextAppt.time} &nbsp;·&nbsp; {nextAppt.room}
+                Dr. {nextAppt.Medic.User.firstName}{" "}
+                {nextAppt.Medic.User.lastName} &nbsp;·&nbsp;{" "}
+                {fmtDate(nextAppt.data_programare)} la {nextAppt.ora_programare}
               </div>
             </div>
-            <button className="pt-next-cta">Add to calendar</button>
+            <button
+              className="pt-next-cta"
+              onClick={() => navigate("/bookAppointment")}
+            >
+              Programează alta
+            </button>
           </div>
         )}
 
@@ -341,10 +308,8 @@ export default function PatientAppointments() {
               value={sort}
               onChange={(e) => setSort(e.target.value)}
             >
-              <option value="date-asc">Earliest first</option>
-              <option value="date-desc">Latest first</option>
-              <option value="type">Type A–Z</option>
-              <option value="doctor">Doctor A–Z</option>
+              <option value="date-asc">Cele mai recente</option>
+              <option value="date-desc">Cele mai vechi</option>
             </select>
             <div className="pt-view-toggle">
               <button
@@ -368,17 +333,17 @@ export default function PatientAppointments() {
         {filtered.length === 0 && (
           <div className="pt-empty">
             <div className="pt-empty-ring">📭</div>
-            <div className="pt-empty-title">No appointments here</div>
+            <div className="pt-empty-title">Nu ai programări aici</div>
             <p className="pt-empty-sub">
               {filter === "all"
-                ? "You don't have any appointments yet. Book your first consultation below."
-                : `You have no ${filter} appointments. Try a different filter.`}
+                ? "Nu ai nicio programare înregistrată încă. Începe prin a face prima programare."
+                : `Nu ai nicio programare cu statusul "${filter}".`}
             </p>
             <button
               className="pt-empty-btn"
-              onClick={() => (window.location.href = "/book")}
+              onClick={() => navigate("/bookAppointment")}
             >
-              + Book an Appointment
+              + Programează o Consultație
             </button>
           </div>
         )}
@@ -391,7 +356,9 @@ export default function PatientAppointments() {
                 className="pt-card"
                 style={{ animationDelay: `${i * 0.05}s` }}
               >
-                <div className={`pt-card-stripe ${a.status}`} />
+                <div
+                  className={`pt-card-stripe ${a.status === "Programată" ? "upcoming" : a.status === "Finalizată" ? "completed" : "cancelled"}`}
+                />
                 <div className="pt-card-body">
                   <div
                     style={{
@@ -403,60 +370,62 @@ export default function PatientAppointments() {
                     }}
                   >
                     <div className="pt-card-date-badge">
-                      <div className="pt-date-day">{fmtDay(a.date)}</div>
-                      <div className="pt-date-month">{fmtMonth(a.date)}</div>
+                      <div className="pt-date-day">
+                        {fmtDay(a.data_programare)}
+                      </div>
+                      <div className="pt-date-month">
+                        {fmtMonth(a.data_programare)}
+                      </div>
                     </div>
-                    <span className={`pt-badge ${a.status}`}>
+                    <span
+                      className={`pt-badge ${a.status === "Programată" ? "upcoming" : a.status === "Finalizată" ? "completed" : "cancelled"}`}
+                    >
                       <span className="pt-badge-dot" />
-                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                      {a.status}
                     </span>
                   </div>
 
                   <div className="pt-card-header">
                     <div>
-                      <div className="pt-card-title">{a.type}</div>
-                      <div className="pt-card-spec">{a.specialty}</div>
+                      <div className="pt-card-title">{a.specializare}</div>
+                      <div className="pt-card-spec">{a.tip_vizita}</div>
                     </div>
                   </div>
 
                   <div className="pt-card-details">
                     <div className="pt-card-detail">
                       <span className="pt-card-detail-icon">👨‍⚕️</span>
-                      <span className="pt-card-detail-val">{a.doctor}</span>
+                      <span className="pt-card-detail-val">
+                        Dr. {a.Medic.User.firstName} {a.Medic.User.lastName}
+                      </span>
                     </div>
                     <div className="pt-card-detail">
                       <span className="pt-card-detail-icon">🕐</span>
                       <span className="pt-card-detail-val">
-                        {a.time} &nbsp;·&nbsp; {a.duration}
+                        {a.ora_programare}
                       </span>
                     </div>
                     <div className="pt-card-detail">
                       <span className="pt-card-detail-icon">📍</span>
                       <span className="pt-card-detail-val">
-                        {a.room} &nbsp;·&nbsp; VitaMed Clinic
+                        Clinica VitaMed
                       </span>
                     </div>
                   </div>
 
-                  {a.note && <div className="pt-card-note">{a.note}</div>}
+                  {a.notes && <div className="pt-card-note">{a.notes}</div>}
 
                   <div className="pt-card-footer">
-                    <span className="pt-card-ref">{a.id}</span>
+                    <span className="pt-card-ref">#{a.id}</span>
                     <div className="pt-card-actions">
-                      {a.status === "completed" && (
+                      {a.status === "Programată" && (
                         <button
-                          className="pt-card-act rebook"
-                          onClick={() => (window.location.href = "/book")}
+                          className="pt-card-act delete"
+                          onClick={() => setModal(a)}
                         >
-                          ↺ Rebook
+                          🗑 Anulează
                         </button>
                       )}
-                      <button
-                        className="pt-card-act delete"
-                        onClick={() => setModal(a)}
-                      >
-                        🗑 Delete
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -468,13 +437,13 @@ export default function PatientAppointments() {
         {view === "list" && filtered.length > 0 && (
           <div className="pt-list-wrap">
             <div className="pt-list-head">
-              <div className="pt-lh">Appointment</div>
-              <div className="pt-lh">Doctor</div>
-              <div className="pt-lh">Date</div>
-              <div className="pt-lh">Time</div>
+              <div className="pt-lh">Programare</div>
+              <div className="pt-lh">Medic</div>
+              <div className="pt-lh">Data</div>
+              <div className="pt-lh">Ora</div>
               <div className="pt-lh">Status</div>
               <div className="pt-lh" style={{ textAlign: "right" }}>
-                Actions
+                Acțiuni
               </div>
             </div>
 
@@ -486,47 +455,43 @@ export default function PatientAppointments() {
               >
                 <div className="pt-lc">
                   <div className="pt-lc-type">
-                    {specialtyIcon(a.specialty)} {a.type}
+                    {specialtyIcon(a.specializare)} {a.specializare}
                   </div>
                   <div className="pt-lc-spec">
-                    {a.specialty} &nbsp;·&nbsp; {a.id}
+                    {a.tip_vizita} &nbsp;·&nbsp; #{a.id}
                   </div>
                 </div>
                 <div className="pt-lc">
-                  <div className="pt-lc-doc">{a.doctor}</div>
-                  <div className="pt-lc-spec2">{a.room}</div>
+                  <div className="pt-lc-doc">
+                    Dr. {a.Medic.User.firstName} {a.Medic.User.lastName}
+                  </div>
+                  <div className="pt-lc-spec2">VitaMed</div>
                 </div>
                 <div className="pt-lc">
-                  <div className="pt-lc-date">{fmtDate(a.date)}</div>
-                  <div className="pt-lc-time">{a.duration}</div>
+                  <div className="pt-lc-date">{fmtDate(a.data_programare)}</div>
                 </div>
                 <div className="pt-lc">
-                  <div className="pt-lc-time">{a.time}</div>
+                  <div className="pt-lc-time">{a.ora_programare}</div>
                 </div>
                 <div className="pt-lc">
-                  <span className={`pt-badge ${a.status}`}>
+                  <span
+                    className={`pt-badge ${a.status === "Programată" ? "upcoming" : a.status === "Finalizată" ? "completed" : "cancelled"}`}
+                  >
                     <span className="pt-badge-dot" />
-                    {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                    {a.status}
                   </span>
                 </div>
                 <div className="pt-lc" style={{ textAlign: "right" }}>
                   <div className="pt-list-acts">
-                    {a.status === "completed" && (
+                    {a.status === "Programată" && (
                       <button
-                        className="pt-la"
-                        title="Rebook"
-                        onClick={() => (window.location.href = "/book")}
+                        className="pt-la del"
+                        title="Anulează"
+                        onClick={() => setModal(a)}
                       >
-                        ↺
+                        🗑
                       </button>
                     )}
-                    <button
-                      className="pt-la del"
-                      title="Delete"
-                      onClick={() => setModal(a)}
-                    >
-                      🗑
-                    </button>
                   </div>
                 </div>
               </div>
@@ -539,9 +504,9 @@ export default function PatientAppointments() {
             <button
               className="pt-empty-btn"
               style={{ display: "inline-flex" }}
-              onClick={() => (window.location.href = "/book")}
+              onClick={() => navigate("/bookAppointment")}
             >
-              + Book a New Appointment
+              + Programează o Consultație Nouă
             </button>
           </div>
         )}

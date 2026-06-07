@@ -23,7 +23,7 @@ async function seed() {
           lastName: d.lastName,
           email: d.email,
           parola: password,
-          rol: "doctor"
+          rol: "medic"
         }
       });
 

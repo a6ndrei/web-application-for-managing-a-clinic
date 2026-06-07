@@ -4,7 +4,9 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import BookAppointment from "./pages/BookAppointment";
+import AppointmentPage from "./pages/AppointmentPage";
 import ManageAppointments from "./pages/ManageAppointments";
+import DoctorPage from "./pages/DoctorPage";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -31,10 +33,26 @@ function App() {
           }
         ></Route>
         <Route
+          path="/my-appointments"
+          element={
+            <ProtectedRoute>
+              <AppointmentPage />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
           path="/manageAppointments"
           element={
             <ProtectedRoute>
               <ManageAppointments />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="/doctor-appointments"
+          element={
+            <ProtectedRoute>
+              <DoctorPage />
             </ProtectedRoute>
           }
         ></Route>
