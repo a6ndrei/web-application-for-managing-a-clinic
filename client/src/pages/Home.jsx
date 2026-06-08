@@ -159,10 +159,10 @@ export default function Home() {
           <li>
             {token ? (
               <button onClick={handleLogout} className="nav-btn-link">
-                Sign Out
+                Deconectare
               </button>
             ) : (
-              <Link to="/login">Sign In</Link>
+              <Link to="/login">Autentificare</Link>
             )}
           </li>
         </ul>
@@ -309,7 +309,7 @@ export default function Home() {
             </div>
             <div className="rating-pills">
               <span className="pill active">★ 4.9 Rating</span>
-              <span className="pill">1,200+ Review-uri</span>
+              <span className="pill">1.200+ Recenzii</span>
               <span className="pill">98% Recomandări</span>
             </div>
           </div>
@@ -346,7 +346,7 @@ export default function Home() {
                 <div className="doctor-title">{d.title}</div>
                 <div className="doctor-rating">
                   <span className="stars">★★★★★</span>
-                  &nbsp;{d.rating} &nbsp;·&nbsp; {d.reviews} reviews
+                  &nbsp;{d.rating} &nbsp;·&nbsp; {d.reviews} recenzii
                 </div>
               </div>
             </div>
@@ -400,11 +400,11 @@ export default function Home() {
                     marginBottom: 10,
                   }}
                 >
-                  Appointment Requested
+                  Programare Solicitată
                 </h3>
                 <p style={{ color: "var(--muted)", fontSize: 14 }}>
-                  Thank you, {form.name}. We'll confirm your slot by email
-                  within the hour.
+                  Vă mulțumim, {form.name}. Vom confirma intervalul ales prin
+                  e-mail în decurs de o oră.
                 </p>
                 <button
                   type="button"
@@ -423,56 +423,56 @@ export default function Home() {
                     });
                   }}
                 >
-                  Book Another
+                  Rezervă o altă programare
                 </button>
               </div>
             ) : (
               <>
-                <div className="form-title">Request an Appointment</div>
+                <div className="form-title">Solicită o Programare</div>
 
                 <div className="form-row">
                   <div className="form-field">
-                    <label>Full Name *</label>
+                    <label>Nume Complet *</label>
                     <input
                       name="name"
                       value={form.name}
                       onChange={handleChange}
-                      placeholder="Your name"
+                      placeholder="Numele dumneavoastră"
                       required
                     />
                   </div>
                   <div className="form-field">
-                    <label>Phone</label>
+                    <label>Telefon</label>
                     <input
                       name="phone"
                       value={form.phone}
                       onChange={handleChange}
-                      placeholder="+1 (555) 000-0000"
+                      placeholder="+40 700 000 000"
                     />
                   </div>
                 </div>
 
                 <div className="form-field">
-                  <label>Email Address *</label>
+                  <label>Adresă de Email *</label>
                   <input
                     name="email"
                     type="email"
                     value={form.email}
                     onChange={handleChange}
-                    placeholder="you@example.com"
+                    placeholder="tu@exemplu.com"
                     required
                   />
                 </div>
 
                 <div className="form-field">
-                  <label>Specialty *</label>
+                  <label>Specialitate *</label>
                   <select
                     name="specialty"
                     value={form.specialty}
                     onChange={handleChange}
                     required
                   >
-                    <option value="">Select a department</option>
+                    <option value="">Selectați un departament</option>
                     {services.map((s) => (
                       <option key={s.name} value={s.name}>
                         {s.name}
@@ -483,7 +483,7 @@ export default function Home() {
 
                 <div className="form-row">
                   <div className="form-field">
-                    <label>Preferred Date *</label>
+                    <label>Data Preferată *</label>
                     <input
                       name="date"
                       type="date"
@@ -493,13 +493,13 @@ export default function Home() {
                     />
                   </div>
                   <div className="form-field">
-                    <label>Preferred Time</label>
+                    <label>Ora Preferată</label>
                     <select
                       name="time"
                       value={form.time}
                       onChange={handleChange}
                     >
-                      <option value="">Any time</option>
+                      <option value="">Orice oră</option>
                       {[
                         "8:00 AM",
                         "9:00 AM",
@@ -520,17 +520,17 @@ export default function Home() {
                 </div>
 
                 <div className="form-field">
-                  <label>Notes (optional)</label>
+                  <label>Note (opțional)</label>
                   <textarea
                     name="note"
                     value={form.note}
                     onChange={handleChange}
-                    placeholder="Symptoms, previous diagnoses, or any other details…"
+                    placeholder="Simptome, diagnostice anterioare sau orice alte detalii…"
                   />
                 </div>
 
                 <button type="submit" className="form-submit">
-                  Confirm Reservation
+                  Confirmă Rezervarea
                 </button>
               </>
             )}
@@ -563,15 +563,19 @@ export default function Home() {
             </ul>
           </div>
           <div className="footer-col">
-            <h4>Clinic</h4>
+            <h4>Clinică</h4>
             <ul>
-              {["About Us", "Our Doctors", "Research", "Careers", "Press"].map(
-                (l) => (
-                  <li key={l}>
-                    <a href="#">{l}</a>
-                  </li>
-                ),
-              )}
+              {[
+                "Despre Noi",
+                "Doctorii Noștri",
+                "Cercetare",
+                "Cariere",
+                "Presă",
+              ].map((l) => (
+                <li key={l}>
+                  <a href="#">{l}</a>
+                </li>
+              ))}
             </ul>
           </div>
           <div className="footer-col footer-contact">
@@ -587,7 +591,7 @@ export default function Home() {
         </div>
         <div className="footer-bottom">
           <span className="footer-copy">
-            © 2025 VitaMed. All rights reserved.
+            © 2025 VitaMed. Toate drepturile rezervate.
           </span>
         </div>
       </footer>

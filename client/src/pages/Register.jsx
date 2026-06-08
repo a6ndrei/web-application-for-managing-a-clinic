@@ -32,15 +32,15 @@ const Register = () => {
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="shadow-lg px-8 py-5 border w-72">
-        <h2 className="text-lg font-bold mb-4">Register</h2>
+        <h2 className="text-lg font-bold mb-4">Înregistrare</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="username" className="block text-gray-700">
-              Username
+              Nume utilizator
             </label>
             <input
               type="text"
-              placeholder="Enter Username"
+              placeholder="Introdu numele de utilizator"
               className="w-full px-3 py-2 border"
               name="username"
               onChange={handleChanges}
@@ -52,7 +52,7 @@ const Register = () => {
             </label>
             <input
               type="email"
-              placeholder="Enter Email"
+              placeholder="Introdu email-ul"
               className="w-full px-3 py-2 border"
               name="email"
               onChange={handleChanges}
@@ -60,24 +60,24 @@ const Register = () => {
           </div>
           <div className="mb-4">
             <label htmlFor="password" className="block text-gray-700">
-              Password
+              Parolă
             </label>
             <input
               type="password"
-              placeholder="Enter Password"
+              placeholder="Introdu parola"
               className="w-full px-3 py-2 border"
               name="password"
               onChange={handleChanges}
             />
           </div>
           <button className="w-full bg-green-600 text-white py-2 ">
-            Submit
+            Înregistrare
           </button>
         </form>
         <div className="text-center">
-          <span>Already have account?</span>
+          <span>Ai deja un cont?</span>
           <Link to="/login" className="text-blue-500">
-            Login
+            Autentificare
           </Link>
         </div>
       </div>

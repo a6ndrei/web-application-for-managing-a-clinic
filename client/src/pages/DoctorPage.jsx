@@ -208,7 +208,7 @@ export default function DoctorPortal() {
         </div>
 
         <nav className="dp-nav">
-          <div className="dp-nav-section">Menu</div>
+          <div className="dp-nav-section">Meniu</div>
           <button className="dp-nav-item active">
             <span className="dp-nav-icon">📅</span>Programările Mele
           </button>
@@ -218,7 +218,7 @@ export default function DoctorPortal() {
           >
             <span className="dp-nav-icon">🏠</span>Acasă
           </button>
-          <div className="dp-nav-section">Account</div>
+          <div className="dp-nav-section">Cont</div>
           <button
             className="dp-nav-item"
             onClick={() => {
@@ -226,7 +226,7 @@ export default function DoctorPortal() {
               window.location.href = "/login";
             }}
           >
-            <span className="dp-nav-icon">🚪</span>Sign Out
+            <span className="dp-nav-icon">🚪</span>Deconectare
           </button>
         </nav>
       </aside>

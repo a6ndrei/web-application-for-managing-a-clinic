@@ -13,7 +13,9 @@ router.post("/forgot-password", async (req, res) => {
   try {
     const user = await Users.findOne({ where: { email } });
     if (!user) {
-      return res.status(404).json({ message: "Nu există un cont cu această adresă de email." });
+      return res
+        .status(404)
+        .json({ message: "Nu există un cont cu această adresă de email." });
     }
 
     const token = crypto.randomBytes(20).toString("hex");
@@ -24,10 +26,13 @@ router.post("/forgot-password", async (req, res) => {
       resetPasswordExpires: expires,
     });
 
-    // Simulăm trimiterea unui email prin afișarea link-ului în consolă
-    console.log(`Link resetare parolă: http://localhost:5173/reset-password/${token}`);
+    console.log(
+      `Link resetare parolă: http://localhost:5173/reset-password/${token}`,
+    );
 
-    res.status(200).json({ message: "Link-ul de resetare a fost trimis pe email." });
+    res
+      .status(200)
+      .json({ message: "Link-ul de resetare a fost trimis pe email." });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -67,7 +72,7 @@ router.post("/register", async (req, res) => {
   try {
     const existingUser = await Users.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(409).json({ message: "User already exists" });
+      return res.status(409).json({ message: "Utilizatorul există deja" });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -85,7 +90,9 @@ router.post("/register", async (req, res) => {
       id_user: newUser.id,
     });
 
-    res.status(201).json({ message: "User created successfully", user: newUser });
+    res
+      .status(201)
+      .json({ message: "Utilizator creat cu succes", user: newUser });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -96,21 +103,23 @@ router.post("/login", async (req, res) => {
   try {
     const user = await Users.findOne({ where: { email } });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Utilizatorul nu a fost găsit" });
     }
 
     const isMatch = await bcrypt.compare(password, user.parola);
     if (!isMatch) {
-      return res.status(401).json({ message: "Wrong password" });
+      return res.status(401).json({ message: "Parolă incorectă" });
     }
 
     const token = jwt.sign(
       { id: user.id, email: user.email, rol: user.rol },
       process.env.JWT_KEY,
-      { expiresIn: "3h" }
+      { expiresIn: "3h" },
     );
 
-    res.status(200).json({ token, user: { id: user.id, email: user.email, rol: user.rol } });
+    res
+      .status(200)
+      .json({ token, user: { id: user.id, email: user.email, rol: user.rol } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -121,12 +130,12 @@ export const verifyToken = (req, res, next) => {
   const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
-    return res.status(403).json({ message: "No token provided" });
+    return res.status(403).json({ message: "Nu a fost furnizat niciun token" });
   }
 
   jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Neautorizat" });
     }
     req.userId = decoded.id;
     req.userRol = decoded.rol;
@@ -137,10 +146,10 @@ export const verifyToken = (req, res, next) => {
 router.get("/me", verifyToken, async (req, res) => {
   try {
     const user = await Users.findByPk(req.userId, {
-      attributes: { exclude: ["parola"] }
+      attributes: { exclude: ["parola"] },
     });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Utilizatorul nu a fost găsit" });
     }
     res.status(200).json({ user });
   } catch (err) {

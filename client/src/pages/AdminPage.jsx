@@ -26,7 +26,7 @@ const FILTERS = ["all", "Programată", "Anulată", "Finalizată"];
 const PAGE_SIZE = 8;
 
 const NAV_ITEMS = [
-  { icon: "🏠", label: "Dashboard", badge: null },
+  { icon: "🏠", label: "Tablou de bord", badge: null },
   { icon: "📋", label: "Programări", badge: null, active: true },
   { icon: "👥", label: "Pacienți", badge: null },
   { icon: "👨‍⚕️", label: "Medici", badge: null },

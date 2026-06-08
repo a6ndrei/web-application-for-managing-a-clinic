@@ -11,8 +11,8 @@ const SPECIALTIES = [
 ];
 
 const VISIT_TYPES = [
-  { icon: "🏥", name: "In-Person", desc: "Visit the clinic" },
-  { icon: "💻", name: "Telehealth", desc: "Video consultation" },
+  { icon: "🏥", name: "În persoană", desc: "Vizită la clinică" },
+  { icon: "💻", name: "Telemedicină", desc: "Consultație video" },
 ];
 
 const TIMES = [
@@ -21,8 +21,8 @@ const TIMES = [
   "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM"
 ];
 
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTHS = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"];
+const DAYS = ["Dum", "Lun", "Mar", "Mie", "Joi", "Vin", "Sâm"];
 const TODAY = new Date();
 
 function Calendar({ selected, onSelect }) {
@@ -71,7 +71,7 @@ function SummaryPanel({ booking }) {
   const spec = SPECIALTIES.find(s => s.name === booking.specialty);
   const fmtDate = (d) => {
     if (!d) return null;
-    return new Date(d + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long" });
+    return new Date(d + "T00:00:00").toLocaleDateString("ro-RO", { weekday: "short", day: "numeric", month: "long" });
   };
   return (
     <aside className="bk-right">
@@ -93,7 +93,7 @@ function SummaryPanel({ booking }) {
         ) : <div className="bk-summary-placeholder">Nu e selectat încă</div>}
       </div>
       <div className="bk-summary-section">
-        <div className="bk-summary-label">Date & Time</div>
+        <div className="bk-summary-label">Dată & Oră</div>
         {booking.date && booking.time ? <div className="bk-summary-val">{fmtDate(booking.date)}<br />{booking.time} · {booking.visitType}</div> : booking.date ? <div className="bk-summary-val">{fmtDate(booking.date)}<br /><span style={{ color: "rgba(255,255,255,0.3)" }}>Ora nu e selectată</span></div> : <div className="bk-summary-placeholder">Nu e selectat încă</div>}
       </div>
       <div className="bk-summary-divider" />
@@ -122,7 +122,7 @@ export default function BookAppointment() {
     doctor: null,
     date: "",
     time: "",
-    visitType: "In-Person",
+    visitType: "În persoană",
     notes: ""
   });
 
@@ -160,7 +160,7 @@ export default function BookAppointment() {
       }, { headers: { Authorization: `Bearer ${token}` } });
       setSubmitted(true);
     } catch (err) {
-      alert(err.response?.data?.message || "Error booking appointment");
+      alert(err.response?.data?.message || "Eroare la rezervarea programării");
     } finally {
       setLoading(false);
     }
