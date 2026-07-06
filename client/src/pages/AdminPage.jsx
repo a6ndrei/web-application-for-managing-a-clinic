@@ -26,10 +26,8 @@ const FILTERS = ["all", "Programată", "Anulată", "Finalizată"];
 const PAGE_SIZE = 8;
 
 const NAV_ITEMS = [
-  { icon: "🏠", label: "Tablou de bord", badge: null },
+  { icon: "🏠", label: "Dashboard", badge: null },
   { icon: "📋", label: "Programări", badge: null, active: true },
-  { icon: "👥", label: "Pacienți", badge: null },
-  { icon: "👨‍⚕️", label: "Medici", badge: null },
 ];
 
 const fmtDate = (d) => {
@@ -553,9 +551,7 @@ export default function AdminAppointments() {
               key={item.label}
               className={`ad-nav-item ${activeTab === item.label ? "active" : ""}`}
               onClick={() => {
-                if (item.label === "Dashboard" || item.label === "Programări") {
-                  setActiveTab(item.label);
-                }
+                setActiveTab(item.label);
               }}
             >
               <span className="ad-nav-icon">{item.icon}</span>
@@ -583,11 +579,13 @@ export default function AdminAppointments() {
       <div className="ad-main">
         <header className="ad-topbar">
           <div className="ad-topbar-left">
-            <div className="ad-topbar-title">{activeTab === "Dashboard" ? "Panou Control & Statistici" : "Gestiune Programări"}</div>
+            <div className="ad-topbar-title">{activeTab === "Dashboard" ? "Panou Control & Statistici" : activeTab === "Programări" ? "Gestiune Programări" : activeTab}</div>
             <div className="ad-topbar-sub">
               {activeTab === "Dashboard" 
                 ? "Analiza datelor, previziuni de volum și performanța platformei" 
-                : "Vizualizează, editează sau anulează orice programare din sistem"}
+                : activeTab === "Programări"
+                ? "Vizualizează, editează sau anulează orice programare din sistem"
+                : `Secțiunea ${activeTab} este în curs de dezvoltare.`}
             </div>
           </div>
           {activeTab === "Programări" && (
@@ -611,7 +609,7 @@ export default function AdminAppointments() {
         <div className="ad-content">
           {activeTab === "Dashboard" ? (
             <DashboardView stats={stats} predictions={predictions} />
-          ) : (
+          ) : activeTab === "Programări" ? (
             <>
               <div className="ad-stats">
                 {[
@@ -622,7 +620,27 @@ export default function AdminAppointments() {
                     num: counts.all,
                     sub: "toate înregistrările",
                   },
-                  // ... rest of stats items
+                  {
+                    cls: "s3",
+                    icon: "✅",
+                    label: "Finalizate",
+                    num: counts["Finalizată"] || 0,
+                    sub: "programări încheiate",
+                  },
+                  {
+                    cls: "s2",
+                    icon: "🕒",
+                    label: "Programate",
+                    num: counts["Programată"] || 0,
+                    sub: "urmează să aibă loc",
+                  },
+                  {
+                    cls: "s4",
+                    icon: "✕",
+                    label: "Anulate",
+                    num: counts["Anulată"] || 0,
+                    sub: "programări anulate",
+                  },
                 ].map((s) => (
                   <div key={s.label} className={`ad-stat ${s.cls}`}>
                     <div className="ad-stat-bg">{s.icon}</div>
@@ -739,7 +757,7 @@ export default function AdminAppointments() {
                   pageSlice.map((a, i) => (
                     <div
                       key={a.id}
-                      className={`ad-row ${i === 0 && page === 1 ? "first-row" : ""} ${selected.has(a.id) ? "selected" : ""} ${a.status === 'Anulată' ? 'cancelled' : ''}`}
+                      className={`ad-row ${selected.has(a.id) ? "selected" : ""} ${a.status === 'Anulată' ? 'cancelled' : ''}`}
                       style={{ animationDelay: `${i * 0.04}s` }}
                       onClick={() => setEditing(a)}
                     >
@@ -851,6 +869,14 @@ export default function AdminAppointments() {
                 )}
               </div>
             </>
+          ) : (
+            <div className="ad-empty">
+              <div className="ad-empty-icon">🚧</div>
+              <div className="ad-empty-title">Secțiune în lucru</div>
+              <div className="ad-empty-sub">
+                Revenim curând cu funcționalități noi pentru {activeTab}.
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -882,3 +908,4 @@ export default function AdminAppointments() {
     </div>
   );
 }
+

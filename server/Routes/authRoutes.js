@@ -119,7 +119,16 @@ router.post("/login", async (req, res) => {
 
     res
       .status(200)
-      .json({ token, user: { id: user.id, email: user.email, rol: user.rol } });
+      .json({ 
+        token, 
+        user: { 
+          id: user.id, 
+          email: user.email, 
+          rol: user.rol,
+          firstName: user.firstName,
+          lastName: user.lastName
+        } 
+      });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -22,7 +22,6 @@ function Toast({ msg, type, onDone }) {
   );
 }
 
-/* ─────────────── Delete Modal ─────────────── */
 function DeleteModal({ appt, onConfirm, onCancel }) {
   return (
     <div className="dp-overlay" onClick={onCancel}>
@@ -32,8 +31,12 @@ function DeleteModal({ appt, onConfirm, onCancel }) {
         <p className="dp-modal-sub">
           Ești pe cale să anulezi programarea pentru{" "}
           <span className="dp-modal-name">{appt.patient.name}</span> pe data de{" "}
-          {fmtDate(appt.date)} la {appt.time}. Această acțiune nu poate fi
-          anulată.
+          {fmtDate(appt.date)} la {appt.time}.
+          <br />
+          <br />
+          <strong style={{ color: "var(--gold)" }}>Important:</strong> Vă rugăm
+          să contactați pacientul telefonic înainte de a anula programarea
+          pentru a-l informa despre această modificare.
         </p>
         <div className="dp-modal-btns">
           <button className="dp-modal-cancel" onClick={onCancel}>
@@ -51,7 +54,6 @@ function DeleteModal({ appt, onConfirm, onCancel }) {
 export default function DoctorPortal() {
   const [appts, setAppts] = useState([]);
   const [filter, setFilter] = useState("all");
-  const [search, setSearch] = useState("");
   const [sort, setSort] = useState("date-asc");
   const [tabDay, setTabDay] = useState("upcoming"); // upcoming | today
   const [modal, setModal] = useState(null);
@@ -115,15 +117,6 @@ export default function DoctorPortal() {
       list = list.filter((a) => a.date === todayStr);
     }
     if (filter !== "all") list = list.filter((a) => a.status === filter);
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (a) =>
-          a.patient.name.toLowerCase().includes(q) ||
-          a.type.toLowerCase().includes(q) ||
-          String(a.id).toLowerCase().includes(q),
-      );
-    }
     list.sort((a, b) => {
       if (sort === "date-asc")
         return (
@@ -138,10 +131,9 @@ export default function DoctorPortal() {
       return 0;
     });
     return list;
-  }, [appts, filter, search, sort, tabDay]);
+  }, [appts, filter, sort, tabDay]);
 
   const accept = (id) => {
-    // Aici am face un apel API pt update status
     setAppts((prev) =>
       prev.map((a) => (a.id === id ? { ...a, status: "accepted" } : a)),
     );
@@ -242,15 +234,6 @@ export default function DoctorPortal() {
             </div>
           </div>
           <div className="dp-topbar-right">
-            <div className="dp-search-wrap">
-              <span className="dp-search-icon">🔍</span>
-              <input
-                className="dp-search"
-                placeholder="Caută pacient sau tip…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
             <div className="dp-tab-toggle">
               <button
                 className={`dp-tab-btn ${tabDay === "today" ? "active" : ""}`}
@@ -328,7 +311,7 @@ export default function DoctorPortal() {
                   <div className="dp-empty-icon">📭</div>
                   <div className="dp-empty-title">Nu s-au găsit programări</div>
                   <div className="dp-empty-sub">
-                    Încearcă să ajustezi filtrele sau căutarea.
+                    Încearcă să ajustezi filtrele sau sortarea.
                   </div>
                 </div>
               ) : (
