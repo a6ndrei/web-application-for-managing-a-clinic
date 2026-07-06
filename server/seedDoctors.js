@@ -9,10 +9,30 @@ async function seed() {
     const password = await bcrypt.hash("parola123", 10);
 
     const doctorsData = [
-      { firstName: "Mihai", lastName: "Popescu", email: "mihai.popescu@vitamed.ro", specializare: "Cardiologie" },
-      { firstName: "Sebastian", lastName: "Stoica", email: "sebastian.stoica@vitamed.ro", specializare: "Neurologie" },
-      { firstName: "Andreea", lastName: "Dumitrescu", email: "andreea.dumitrescu@vitamed.ro", specializare: "Oftalmologie" },
-      { firstName: "Ioana", lastName: "Marinescu", email: "ioana.marinescu@vitamed.ro", specializare: "Dermatologie" }
+      {
+        firstName: "Mihai",
+        lastName: "Popescu",
+        email: "mihai.popescu@vitamed.ro",
+        specializare: "Cardiologie",
+      },
+      {
+        firstName: "Sebastian",
+        lastName: "Stoica",
+        email: "sebastian.stoica@vitamed.ro",
+        specializare: "Neurologie",
+      },
+      {
+        firstName: "Andreea",
+        lastName: "Dumitrescu",
+        email: "andreea.dumitrescu@vitamed.ro",
+        specializare: "Oftalmologie",
+      },
+      {
+        firstName: "Ioana",
+        lastName: "Marinescu",
+        email: "ioana.marinescu@vitamed.ro",
+        specializare: "Dermatologie",
+      },
     ];
 
     for (const d of doctorsData) {
@@ -23,8 +43,8 @@ async function seed() {
           lastName: d.lastName,
           email: d.email,
           parola: password,
-          rol: "medic"
-        }
+          rol: "medic",
+        },
       });
 
       if (created || user) {
@@ -32,13 +52,24 @@ async function seed() {
           where: { id_user: user.id },
           defaults: {
             id_user: user.id,
-            specializare: d.specializare
-          }
+            specializare: d.specializare,
+          },
         });
       }
     }
 
-    console.log("Doctorii au fost adăugați cu succes!");
+    await Users.findOrCreate({
+      where: { email: "admin@vitamed.ro" },
+      defaults: {
+        firstName: "admin",
+        lastName: "admin",
+        email: "admin@vitamed.ro",
+        parola: "$2b$10$EI9rOpDqSKlOnwlSQYz7VeOqH.xNKrt5y0vRq/lDhxIKpPp0/HvW6",
+        rol: "admin",
+      },
+    });
+
+    console.log("Doctorii și administratorul au fost adăugați cu succes!");
     process.exit(0);
   } catch (err) {
     console.error("Eroare la popularea bazei de date:", err);
