@@ -59,7 +59,8 @@ function Modal({ action, appt, onConfirm, onCancel }) {
         <div className="ma-modal-title">{c.title}</div>
         <p className="ma-modal-sub">
           {c.sub} <span className="ma-modal-patient">{appt.patient.name}</span>{" "}
-          pe data de {fmtDate(appt.date)} la {appt.time}. Această acțiune nu poate fi anulată.
+          pe data de {fmtDate(appt.date)} la {appt.time}. Această acțiune nu
+          poate fi anulată.
         </p>
         <div className="ma-modal-btns">
           <button className="ma-modal-cancel" onClick={onCancel}>
@@ -163,7 +164,6 @@ export default function ManageAppointments() {
   }, [appts, filter, search, sort]);
 
   const setStatus = (id, status) => {
-    // În mod normal am face un apel API aici
     setAppts((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
     const labels = {
       Programată: "Programare restabilită",
@@ -211,7 +211,12 @@ export default function ManageAppointments() {
     </>
   );
 
-  if (loading) return <div style={{ color: "white", padding: 50, textAlign: "center" }}>Se încarcă programările...</div>;
+  if (loading)
+    return (
+      <div style={{ color: "white", padding: 50, textAlign: "center" }}>
+        Se încarcă programările...
+      </div>
+    );
 
   return (
     <div className="ma-shell">
@@ -235,7 +240,13 @@ export default function ManageAppointments() {
             </button>
           ))}
           <div className="ma-nav-label">Account</div>
-          <button className="ma-nav-item" onClick={() => { localStorage.removeItem("token"); window.location.href="/login"; }}>
+          <button
+            className="ma-nav-item"
+            onClick={() => {
+              localStorage.removeItem("token");
+              window.location.href = "/login";
+            }}
+          >
             <span className="ma-nav-icon">🚪</span>Sign Out
           </button>
         </nav>
@@ -361,7 +372,9 @@ export default function ManageAppointments() {
                           <div className="ma-card-email">{a.patient.email}</div>
                         </div>
                       </div>
-                      <span className={`ma-badge ${a.status === "Programată" ? "pending" : a.status === "Finalizată" ? "accepted" : "declined"}`}>
+                      <span
+                        className={`ma-badge ${a.status === "Programată" ? "pending" : a.status === "Finalizată" ? "accepted" : "declined"}`}
+                      >
                         <span className="ma-badge-dot" />
                         {a.status}
                       </span>
@@ -467,7 +480,9 @@ export default function ManageAppointments() {
                       <span className="ma-type-pill">{a.type}</span>
                     </div>
                     <div className="ma-cell">
-                      <span className={`ma-badge ${a.status === "Programată" ? "pending" : a.status === "Finalizată" ? "accepted" : "declined"}`}>
+                      <span
+                        className={`ma-badge ${a.status === "Programată" ? "pending" : a.status === "Finalizată" ? "accepted" : "declined"}`}
+                      >
                         <span className="ma-badge-dot" />
                         {a.status}
                       </span>

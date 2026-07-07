@@ -188,15 +188,6 @@ export default function AppointmentPage() {
               Programări
             </a>
           </li>
-          <li>
-            <a href="#">Rezultate Analize</a>
-          </li>
-          <li>
-            <a href="#">Mesaje</a>
-          </li>
-          <li>
-            <a href="#">Profil</a>
-          </li>
         </ul>
         <div
           className="pt-nav-user"

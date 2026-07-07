@@ -132,7 +132,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); m
 .ma-sum-num { font-family: var(--serif); font-size: 38px; font-weight: 300; color: var(--navy); line-height: 1; }
 .ma-sum-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
-/* ── Filters bar ── */
+
 .ma-filters { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
 .ma-filter-btn {
   padding: 7px 16px; border-radius: 100px; border: 1px solid var(--border);

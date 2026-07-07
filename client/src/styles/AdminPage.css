@@ -398,7 +398,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); m
 .ad-toast-icon.del { color:#FF6B6B; }
 .ad-toast-icon.edit{ color:var(--gold); }
 
-/* Dashboard Styles */
+
 .ad-dashboard-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
