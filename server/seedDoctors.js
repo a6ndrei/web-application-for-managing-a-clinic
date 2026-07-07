@@ -69,7 +69,7 @@ async function seed() {
       },
     });
 
-    console.log("Doctorii și administratorul au fost adăugați cu succes!");
+    console.log("Doctorii și administratorul au fost adaugati cu succes!");
     process.exit(0);
   } catch (err) {
     console.error("Eroare la popularea bazei de date:", err);

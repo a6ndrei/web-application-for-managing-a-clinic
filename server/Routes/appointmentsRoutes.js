@@ -141,14 +141,29 @@ router.delete("/admin/:id", verifyToken, async (req, res) => {
 
 router.delete("/cancel/:id", verifyToken, async (req, res) => {
   try {
-    const pacient = await Pacient.findOne({ where: { id_user: req.userId } });
     const appointment = await Programari.findByPk(req.params.id);
 
     if (!appointment) {
       return res.status(404).json({ message: "Programarea nu a fost găsită." });
     }
 
-    if (appointment.id_pacient !== pacient.id) {
+    let isAuthorized = false;
+
+    if (req.userRol === "pacient") {
+      const pacient = await Pacient.findOne({ where: { id_user: req.userId } });
+      if (pacient && appointment.id_pacient === pacient.id) {
+        isAuthorized = true;
+      }
+    } else if (req.userRol === "medic") {
+      const medic = await Medic.findOne({ where: { id_user: req.userId } });
+      if (medic && appointment.id_medic === medic.id) {
+        isAuthorized = true;
+      }
+    } else if (req.userRol === "admin") {
+      isAuthorized = true;
+    }
+
+    if (!isAuthorized) {
       return res.status(403).json({
         message: "Nu aveți permisiunea de a anula această programare.",
       });
